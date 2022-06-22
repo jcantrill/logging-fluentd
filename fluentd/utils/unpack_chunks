@@ -1,0 +1,75 @@
+#!/bin/env ruby
+
+# Sanitize the buffer message chunks by unpacking.Verify the file buffers to confirm they
+# are deserializable and include the necessary
+# keys/values to push to Elasticsearch
+#
+require 'logger'
+require 'msgpack'
+require 'optparse'
+require 'ostruct'
+require 'fileutils'
+require 'fluent/msgpack_factory'
+
+DEFAULT_BUFFER_DIR='/var/lib/fluentd'
+
+options = OpenStruct.new(
+  dir: '/var/lib/fluentd',
+  log_level: Logger::INFO,
+)
+
+$parser = OptionParser.new do |opts|
+  opts.banner = %Q(
+    Usage: #{File.basename(__FILE__)} [options]
+
+    Unpack the buffer chunks
+  )
+
+
+  opts.on("-d", "--directory DIRECTORY", "The directory where to find buffers to unpack", "Default: #{options.dir}") do |dir|
+    options.dir = dir
+  end
+
+  opts.on_tail("-v", "--verbose", "Run verbosely") do |v|
+    options.log_level = Logger::DEBUG
+  end
+end
+$parser.parse!
+
+$logger = Logger.new(STDOUT)
+$logger.level = options.log_level
+$logger.formatter = proc do |s, date, prog, msg|
+  "[#{s}] - #{msg}\n"
+end
+
+$logger.debug("options: #{options}")
+
+def validate_args(options)
+  unless Dir.exists?(options.dir)
+      $logger.error("Unable to continue. Buffer directory does not exist: #{options.dir}")
+      return false
+  end
+  return true
+end
+
+def unpack(file)
+  u = Fluent::MessagePackFactory.msgpack_unpacker(File.new(file, 'r'))
+  u.each do |obj|
+    puts "#{obj}"
+  end
+end
+
+def process(opts)
+    $logger.debug("Processing directory #{opts.dir}")
+    Dir["#{opts.dir}/*"].each do |f|
+      next if File.directory?(f)
+      unpack(f)
+    end
+end
+
+unless validate_args(options)
+  puts $parser.help()
+  exit 1
+end
+
+process(options)

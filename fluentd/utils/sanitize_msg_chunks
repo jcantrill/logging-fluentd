@@ -9,6 +9,7 @@ require 'msgpack'
 require 'optparse'
 require 'ostruct'
 require 'fileutils'
+require 'fluent/msgpack_factory'
 
 DEFAULT_BUFFER_DIR='/var/lib/fluentd'
 
@@ -139,17 +140,17 @@ end
 def unpack(opts, handler, file)
   $logger.info("Checking #{File.basename(file)}")
   clean_file = file + '.clean'
-  p = MessagePack::Packer.new(File.open(clean_file, 'w'))
-  u = MessagePack::Unpacker.new(File.new(file, 'r'))
+  p = Fluent::MessagePackFactory.msgpack_packer(File.open(clean_file, 'w'))
+  u = Fluent::MessagePackFactory.msgpack_unpacker(File.new(file, 'r'))
   u.each do |obj|
+    puts "#{obj}"
     begin
       time = obj[0]
       record = obj[1]
-      target_index = record[opts.index_field]
-      target_index = target_index.downcase
       check_record($logger, time, record) if defined?(check_record)
       p.write(obj).flush
     rescue=>e
+        $logger.info("Error: #{e}")
         record = obj if record.nil?
         handler.handle_msg(e, time, record)
     end
