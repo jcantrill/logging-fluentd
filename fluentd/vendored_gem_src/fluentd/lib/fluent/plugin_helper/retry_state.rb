@@ -44,8 +44,6 @@ module Fluent
 
           @timeout = timeout
           @timeout_at = @start + timeout
-          @has_reached_timeout = false
-          @has_timed_out = false
           @current = :primary
 
           if randomize_width < 0 || randomize_width > 0.5
@@ -100,7 +98,7 @@ module Fluent
               naive
             end
           elsif @current == :secondary
-            naive = naive_next_time(@steps - @secondary_transition_steps)
+            naive = naive_next_time(@steps - @secondary_transition_steps + 1)
             if naive >= @timeout_at
               @timeout_at
             else
@@ -125,15 +123,7 @@ module Fluent
             @current = :secondary
             @secondary_transition_steps = @steps
           end
-
           @next_time = calc_next_time
-
-          if @has_reached_timeout
-            @has_timed_out = @next_time >= @timeout_at
-          else
-            @has_reached_timeout = @next_time >= @timeout_at
-          end
-
           nil
         end
 
@@ -145,7 +135,7 @@ module Fluent
           if @forever
             false
           else
-            @has_timed_out || !!(@max_steps && @steps >= @max_steps)
+            @next_time >= @timeout_at || !!(@max_steps && @steps >= @max_steps)
           end
         end
       end
@@ -175,7 +165,7 @@ module Fluent
         end
 
         def calc_interval(num)
-          interval = raw_interval(num)
+          interval = raw_interval(num - 1)
           if @max_interval && interval > @max_interval
             @max_interval
           else
@@ -185,7 +175,7 @@ module Fluent
               # Calculate previous finite value to avoid inf related errors. If this re-computing is heavy, use cache.
               until interval.finite?
                 num -= 1
-                interval = raw_interval(num)
+                interval = raw_interval(num - 1)
               end
               interval
             end

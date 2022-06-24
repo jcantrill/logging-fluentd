@@ -5,77 +5,10 @@ require 'fluent/plugin/bare_output'
 require 'fluent/plugin/filter'
 
 module FluentTest
-  class FluentTestCounterMetrics < Fluent::Plugin::Metrics
-    Fluent::Plugin.register_metrics('test_counter', self)
-
-    attr_reader :data
-
-    def initialize
-      super
-      @data = 0
-    end
-    def get
-      @data
-    end
-    def inc
-      @data +=1
-    end
-    def add(value)
-      @data += value
-    end
-    def set(value)
-      @data = value
-    end
-    def close
-      @data = 0
-      super
-    end
-  end
-
-  class FluentTestGaugeMetrics < Fluent::Plugin::Metrics
-    Fluent::Plugin.register_metrics('test_gauge', self)
-
-    attr_reader :data
-
-    def initialize
-      super
-      @data = 0
-    end
-    def get
-      @data
-    end
-    def inc
-      @data += 1
-    end
-    def dec
-      @data -=1
-    end
-    def add(value)
-      @data += value
-    end
-    def sub(value)
-      @data -= value
-    end
-    def set(value)
-      @data = value
-    end
-    def close
-      @data = 0
-      super
-    end
-  end
-
   class FluentTestInput < ::Fluent::Plugin::Input
     ::Fluent::Plugin.register_input('test_in', self)
 
     attr_reader :started
-
-    def initialize
-      super
-      # stub metrics instances
-      @emit_records_metrics = FluentTest::FluentTestCounterMetrics.new
-      @emit_size_metrics = FluentTest::FluentTestCounterMetrics.new
-    end
 
     def start
       super
@@ -94,13 +27,6 @@ module FluentTest
     attr_reader :started
 
     config_param :num, :integer, default: 10000
-
-    def initialize
-      super
-      # stub metrics instances
-      @emit_records_metrics = FluentTest::FluentTestCounterMetrics.new
-      @emit_size_metrics = FluentTest::FluentTestCounterMetrics.new
-    end
 
     def start
       super
@@ -123,15 +49,6 @@ module FluentTest
     def initialize
       super
       @events = Hash.new { |h, k| h[k] = [] }
-      # stub metrics instances
-      @num_errors_metrics = FluentTest::FluentTestCounterMetrics.new
-      @emit_count_metrics = FluentTest::FluentTestCounterMetrics.new
-      @emit_records_metrics = FluentTest::FluentTestCounterMetrics.new
-      @emit_size_metrics = FluentTest::FluentTestCounterMetrics.new
-      @write_count_metrics = FluentTest::FluentTestCounterMetrics.new
-      @rollback_count_metrics = FluentTest::FluentTestCounterMetrics.new
-      @flush_time_count_metrics = FluentTest::FluentTestCounterMetrics.new
-      @slow_flush_count_metrics = FluentTest::FluentTestCounterMetrics.new
     end
 
     attr_reader :events
@@ -251,19 +168,6 @@ module FluentTest
   class FluentTestErrorOutput < ::Fluent::Plugin::Output
     ::Fluent::Plugin.register_output('test_out_error', self)
 
-    def initialize
-      super
-      # stub metrics instances
-      @num_errors_metrics = FluentTest::FluentTestCounterMetrics.new
-      @emit_count_metrics = FluentTest::FluentTestCounterMetrics.new
-      @emit_records_metrics = FluentTest::FluentTestCounterMetrics.new
-      @emit_size_metrics = FluentTest::FluentTestCounterMetrics.new
-      @write_count_metrics = FluentTest::FluentTestCounterMetrics.new
-      @rollback_count_metrics = FluentTest::FluentTestCounterMetrics.new
-      @flush_time_count_metrics = FluentTest::FluentTestCounterMetrics.new
-      @slow_flush_count_metrics = FluentTest::FluentTestCounterMetrics.new
-    end
-
     def format(tag, time, record)
       raise "emit error!"
     end
@@ -280,9 +184,6 @@ module FluentTest
       super()
       @num = 0
       @field = field
-      # stub metrics instances
-      @emit_records_metrics = FluentTest::FluentTestCounterMetrics.new
-      @emit_size_metrics = FluentTest::FluentTestCounterMetrics.new
     end
 
     attr_reader :num
@@ -312,9 +213,6 @@ module FluentTest
       super()
       @num = 0
       @field = field
-      # stub metrics instances
-      @emit_records_metrics = FluentTest::FluentTestCounterMetrics.new
-      @emit_size_metrics = FluentTest::FluentTestCounterMetrics.new
     end
 
     attr_reader :num

@@ -12,38 +12,32 @@ class ForwardOutputTest < Test::Unit::TestCase
     FileUtils.rm_rf(TMP_DIR)
     FileUtils.mkdir_p(TMP_DIR)
     @d = nil
-    @target_port = unused_port
   end
 
   def teardown
     @d.instance_shutdown if @d
-    @port = nil
   end
 
   TMP_DIR = File.join(__dir__, "../tmp/out_forward#{ENV['TEST_ENV_NUMBER']}")
 
   TARGET_HOST = '127.0.0.1'
+  TARGET_PORT = unused_port
+  CONFIG = %[
+    send_timeout 51
+    heartbeat_type udp
+    <server>
+      name test
+      host #{TARGET_HOST}
+      port #{TARGET_PORT}
+    </server>
+  ]
 
-  def config
-    %[
-      send_timeout 51
-      heartbeat_type udp
-      <server>
-        name test
-        host #{TARGET_HOST}
-        port #{@target_port}
-      </server>
-    ]
-  end
+  TARGET_CONFIG = %[
+    port #{TARGET_PORT}
+    bind #{TARGET_HOST}
+  ]
 
-  def target_config
-    %[
-      port #{@target_port}
-      bind #{TARGET_HOST}
-    ]
-  end
-
-  def create_driver(conf=config)
+  def create_driver(conf=CONFIG)
     Fluent::Test::Driver::Output.new(Fluent::Plugin::ForwardOutput) {
       attr_reader :sent_chunk_ids, :ack_handler, :discovery_manager
 
@@ -66,7 +60,7 @@ class ForwardOutputTest < Test::Unit::TestCase
       <server>
         name test
         host #{TARGET_HOST}
-        port #{@target_port}
+        port #{TARGET_PORT}
       </server>
     ])
     nodes = d.instance.nodes
@@ -77,7 +71,7 @@ class ForwardOutputTest < Test::Unit::TestCase
     node = nodes.first
     assert_equal "test", node.name
     assert_equal '127.0.0.1', node.host
-    assert_equal @target_port, node.port
+    assert_equal TARGET_PORT, node.port
   end
 
   test 'configure_traditional' do
@@ -86,7 +80,7 @@ class ForwardOutputTest < Test::Unit::TestCase
       <server>
         name test
         host #{TARGET_HOST}
-        port #{@target_port}
+        port #{TARGET_PORT}
       </server>
       buffer_chunk_limit 10m
 EOL
@@ -106,7 +100,7 @@ EOL
       ack_response_timeout 20
       <server>
         host #{TARGET_HOST}
-        port #{@target_port}
+        port #{TARGET_PORT}
       </server>
     ])
     assert_equal 30, d.instance.send_timeout
@@ -116,33 +110,33 @@ EOL
   end
 
   test 'configure_udp_heartbeat' do
-    @d = d = create_driver(config + "\nheartbeat_type udp")
+    @d = d = create_driver(CONFIG + "\nheartbeat_type udp")
     assert_equal :udp, d.instance.heartbeat_type
   end
 
   test 'configure_none_heartbeat' do
-    @d = d = create_driver(config + "\nheartbeat_type none")
+    @d = d = create_driver(CONFIG + "\nheartbeat_type none")
     assert_equal :none, d.instance.heartbeat_type
   end
 
   test 'configure_expire_dns_cache' do
-    @d = d = create_driver(config + "\nexpire_dns_cache 5")
+    @d = d = create_driver(CONFIG + "\nexpire_dns_cache 5")
     assert_equal 5, d.instance.expire_dns_cache
   end
 
   test 'configure_dns_round_robin udp' do
     assert_raise(Fluent::ConfigError) do
-      create_driver(config + "\nheartbeat_type udp\ndns_round_robin true")
+      create_driver(CONFIG + "\nheartbeat_type udp\ndns_round_robin true")
     end
   end
 
   test 'configure_dns_round_robin transport' do
-    @d = d = create_driver(config + "\nheartbeat_type transport\ndns_round_robin true")
+    @d = d = create_driver(CONFIG + "\nheartbeat_type transport\ndns_round_robin true")
     assert_equal true, d.instance.dns_round_robin
   end
 
   test 'configure_dns_round_robin none' do
-    @d = d = create_driver(config + "\nheartbeat_type none\ndns_round_robin true")
+    @d = d = create_driver(CONFIG + "\nheartbeat_type none\ndns_round_robin true")
     assert_equal true, d.instance.dns_round_robin
   end
 
@@ -182,7 +176,7 @@ EOL
       #{param} #{dummy_cert_path}
       <server>
         host #{TARGET_HOST}
-        port #{@target_port}
+        port #{TARGET_PORT}
       </server>
     ]
 
@@ -201,7 +195,7 @@ EOL
         tls_cert_thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b
         <server>
           host #{TARGET_HOST}
-          port #{@target_port}
+          port #{TARGET_PORT}
         </server>
       ]
 
@@ -216,7 +210,7 @@ EOL
         transport tls
         <server>
           host #{TARGET_HOST}
-          port #{@target_port}
+          port #{TARGET_PORT}
         </server>
       ]
 
@@ -238,7 +232,7 @@ EOL
         tls_cert_logical_store_name Root
         <server>
           host #{TARGET_HOST}
-          port #{@target_port}
+          port #{TARGET_PORT}
         </server>
       ]
 
@@ -256,7 +250,7 @@ EOL
         tls_cert_thumbprint a909502dd82ae41433e6f83886b00d4277a32a7b
         <server>
           host #{TARGET_HOST}
-          port #{@target_port}
+          port #{TARGET_PORT}
         </server>
       ]
 
@@ -283,16 +277,11 @@ EOL
 </service_discovery>
     ])
 
-
-    assert_equal(
-      [
-        { host: '127.0.0.1', port: 1234 },
-        { host: '127.0.0.1', port: 1235 },
-      ],
-      d.instance.discovery_manager.services.collect do |service|
-        { host: service.host, port: service.port }
-      end
-    )
+    assert_equal 2, d.instance.discovery_manager.services.size
+    assert_equal '127.0.0.1', d.instance.discovery_manager.services[0].host
+    assert_equal 1234, d.instance.discovery_manager.services[0].port
+    assert_equal '127.0.0.1', d.instance.discovery_manager.services[1].host
+    assert_equal 1235, d.instance.discovery_manager.services[1].port
   end
 
   test 'pass username and password as empty string to HandshakeProtocol' do
@@ -327,7 +316,7 @@ EOL
   end
 
   test 'set_compress_is_gzip' do
-    @d = d = create_driver(config + %[compress gzip])
+    @d = d = create_driver(CONFIG + %[compress gzip])
     assert_equal :gzip, d.instance.compress
     assert_equal :gzip, d.instance.buffer.compress
 
@@ -339,7 +328,7 @@ EOL
     mock = flexmock($log)
     mock.should_receive(:log).with("buffer is compressed.  If you also want to save the bandwidth of a network, Add `compress` configuration in <match>")
 
-    @d = d = create_driver(config + %[
+    @d = d = create_driver(CONFIG + %[
        <buffer>
          type memory
          compress gzip
@@ -353,7 +342,7 @@ EOL
   end
 
   test 'phi_failure_detector disabled' do
-    @d = d = create_driver(config + %[phi_failure_detector false \n phi_threshold 0])
+    @d = d = create_driver(CONFIG + %[phi_failure_detector false \n phi_threshold 0])
     node = d.instance.nodes.first
     stub(node.failure).phi { raise 'Should not be called' }
     node.tick
@@ -361,20 +350,20 @@ EOL
   end
 
   test 'phi_failure_detector enabled' do
-    @d = d = create_driver(config + %[phi_failure_detector true \n phi_threshold 0])
+    @d = d = create_driver(CONFIG + %[phi_failure_detector true \n phi_threshold 0])
     node = d.instance.nodes.first
     node.tick
     assert_false node.available?
   end
 
   test 'require_ack_response is disabled in default' do
-    @d = d = create_driver(config)
+    @d = d = create_driver(CONFIG)
     assert_equal false, d.instance.require_ack_response
     assert_equal 190, d.instance.ack_response_timeout
   end
 
   test 'require_ack_response can be enabled' do
-    @d = d = create_driver(config + %[
+    @d = d = create_driver(CONFIG + %[
       require_ack_response true
       ack_response_timeout 2s
     ])
@@ -384,7 +373,7 @@ EOL
   end
 
   test 'suspend_flush is disable before before_shutdown' do
-    @d = d = create_driver(config + %[
+    @d = d = create_driver(CONFIG + %[
       require_ack_response true
       ack_response_timeout 2s
     ])
@@ -393,7 +382,7 @@ EOL
   end
 
   test 'suspend_flush should be enabled and try_flush returns nil after before_shutdown' do
-    @d = d = create_driver(config + %[
+    @d = d = create_driver(CONFIG + %[
       require_ack_response true
       ack_response_timeout 2s
     ])
@@ -404,12 +393,12 @@ EOL
   end
 
   test 'verify_connection_at_startup is disabled in default' do
-    @d = d = create_driver(config)
+    @d = d = create_driver(CONFIG)
     assert_false d.instance.verify_connection_at_startup
   end
 
   test 'verify_connection_at_startup can be enabled' do
-    @d = d = create_driver(config + %[
+    @d = d = create_driver(CONFIG + %[
       verify_connection_at_startup true
     ])
     assert_true d.instance.verify_connection_at_startup
@@ -418,7 +407,7 @@ EOL
   test 'send tags in str (utf-8 strings)' do
     target_input_driver = create_target_input_driver
 
-    @d = d = create_driver(config + %[flush_interval 1s])
+    @d = d = create_driver(CONFIG + %[flush_interval 1s])
 
     time = event_time("2011-01-02 13:14:15 UTC")
 
@@ -451,7 +440,7 @@ EOL
   test 'send_with_time_as_integer' do
     target_input_driver = create_target_input_driver
 
-    @d = d = create_driver(config + %[flush_interval 1s])
+    @d = d = create_driver(CONFIG + %[flush_interval 1s])
 
     time = event_time("2011-01-02 13:14:15 UTC")
 
@@ -479,7 +468,7 @@ EOL
   test 'send_without_time_as_integer' do
     target_input_driver = create_target_input_driver
 
-    @d = d = create_driver(config + %[
+    @d = d = create_driver(CONFIG + %[
       flush_interval 1s
       time_as_integer false
     ])
@@ -509,7 +498,7 @@ EOL
   test 'send_comprssed_message_pack_stream_if_compress_is_gzip' do
     target_input_driver = create_target_input_driver
 
-    @d = d = create_driver(config + %[
+    @d = d = create_driver(CONFIG + %[
       flush_interval 1s
       compress gzip
     ])
@@ -539,7 +528,7 @@ EOL
   test 'send_to_a_node_supporting_responses' do
     target_input_driver = create_target_input_driver
 
-    @d = d = create_driver(config + %[flush_interval 1s])
+    @d = d = create_driver(CONFIG + %[flush_interval 1s])
 
     time = event_time("2011-01-02 13:14:15 UTC")
 
@@ -565,7 +554,7 @@ EOL
   test 'send_to_a_node_not_supporting_responses' do
     target_input_driver = create_target_input_driver
 
-    @d = d = create_driver(config + %[flush_interval 1s])
+    @d = d = create_driver(CONFIG + %[flush_interval 1s])
 
     time = event_time("2011-01-02 13:14:15 UTC")
 
@@ -591,7 +580,7 @@ EOL
   test 'a node supporting responses' do
     target_input_driver = create_target_input_driver
 
-    @d = d = create_driver(config + %[
+    @d = d = create_driver(CONFIG + %[
       require_ack_response true
       ack_response_timeout 1s
       <buffer tag>
@@ -639,9 +628,9 @@ EOL
   test 'a node supporting responses after stop' do
     target_input_driver = create_target_input_driver
 
-    @d = d = create_driver(config + %[
+    @d = d = create_driver(CONFIG + %[
       require_ack_response true
-      ack_response_timeout 10s
+      ack_response_timeout 1s
       <buffer tag>
         flush_mode immediate
         retry_type periodic
@@ -693,7 +682,7 @@ EOL
   test 'TLS transport and ack parameter combination' do |ack|
     omit "TLS and 'ack false' always fails on AppVeyor. Need to debug" if Fluent.windows? && !ack
 
-    input_conf = target_config + %[
+    input_conf = TARGET_CONFIG + %[
                    <transport tls>
                      insecure true
                    </transport>
@@ -707,7 +696,7 @@ EOL
       tls_insecure_mode true
       <server>
         host #{TARGET_HOST}
-        port #{@target_port}
+        port #{TARGET_PORT}
       </server>
       <buffer>
         #flush_mode immediate
@@ -736,7 +725,7 @@ EOL
   test 'a destination node not supporting responses by just ignoring' do
     target_input_driver = create_target_input_driver(response_stub: ->(_option) { nil }, disconnect: false)
 
-    @d = d = create_driver(config + %[
+    @d = d = create_driver(CONFIG + %[
       require_ack_response true
       ack_response_timeout 1s
       <buffer tag>
@@ -781,7 +770,7 @@ EOL
   test 'a destination node not supporting responses by disconnection' do
     target_input_driver = create_target_input_driver(response_stub: ->(_option) { nil }, disconnect: true)
 
-    @d = d = create_driver(config + %[
+    @d = d = create_driver(CONFIG + %[
       require_ack_response true
       ack_response_timeout 1s
       <buffer tag>
@@ -824,7 +813,7 @@ EOL
   end
 
   test 'authentication_with_shared_key' do
-    input_conf = target_config + %[
+    input_conf = TARGET_CONFIG + %[
                    <security>
                      self_hostname in.localhost
                      shared_key fluentd-sharedkey
@@ -844,7 +833,7 @@ EOL
       <server>
         name test
         host #{TARGET_HOST}
-        port #{@target_port}
+        port #{TARGET_PORT}
         shared_key fluentd-sharedkey
       </server>
     ]
@@ -871,7 +860,7 @@ EOL
   end
 
   test 'keepalive + shared_key' do
-    input_conf = target_config + %[
+    input_conf = TARGET_CONFIG + %[
                    <security>
                      self_hostname in.localhost
                      shared_key fluentd-sharedkey
@@ -889,7 +878,7 @@ EOL
       <server>
         name test
         host #{TARGET_HOST}
-        port #{@target_port}
+        port #{TARGET_PORT}
       </server>
     ]
     @d = d = create_driver(output_conf)
@@ -919,7 +908,7 @@ EOL
   end
 
    test 'authentication_with_user_auth' do
-    input_conf = target_config + %[
+    input_conf = TARGET_CONFIG + %[
                    <security>
                      self_hostname in.localhost
                      shared_key fluentd-sharedkey
@@ -944,7 +933,7 @@ EOL
       <server>
         name test
         host #{TARGET_HOST}
-        port #{@target_port}
+        port #{TARGET_PORT}
         shared_key fluentd-sharedkey
         username fluentd
         password fluentd
@@ -974,7 +963,7 @@ EOL
 
   # This test is not 100% but test failed with previous Node implementation which has race condition
   test 'Node with security is thread-safe on multi threads' do
-    input_conf = target_config + %[
+    input_conf = TARGET_CONFIG + %[
                    <security>
                      self_hostname in.localhost
                      shared_key fluentd-sharedkey
@@ -993,7 +982,7 @@ EOL
       <server>
         name test
         host #{TARGET_HOST}
-        port #{@target_port}
+        port #{TARGET_PORT}
         shared_key fluentd-sharedkey
       </server>
     ]
@@ -1014,12 +1003,10 @@ EOL
     end
 
     logs = d.logs
-    assert_false(logs.any? { |log|
-                   log.include?("invalid format for PONG message") || log.include?("shared key mismatch")
-                 }, "Actual log:\n#{logs.join}")
+    assert_false(logs.any? { |log| log.include?("invalid format for PONG message") || log.include?("shared key mismatch") }, "'#{logs.last.strip}' happens")
   end
 
-  def create_target_input_driver(response_stub: nil, disconnect: false, conf: target_config)
+  def create_target_input_driver(response_stub: nil, disconnect: false, conf: TARGET_CONFIG)
     require 'fluent/plugin/in_forward'
 
     # TODO: Support actual TCP heartbeat test
@@ -1035,7 +1022,7 @@ EOL
   end
 
   test 'heartbeat_type_none' do
-    @d = d = create_driver(config + "\nheartbeat_type none")
+    @d = d = create_driver(CONFIG + "\nheartbeat_type none")
     node = d.instance.nodes.first
     assert_equal Fluent::Plugin::ForwardOutput::NoneHeartbeatNode, node.class
 
@@ -1049,7 +1036,7 @@ EOL
   end
 
   test 'heartbeat_type_udp' do
-    @d = d = create_driver(config + "\nheartbeat_type udp")
+    @d = d = create_driver(CONFIG + "\nheartbeat_type udp")
 
     d.instance_start
     usock = d.instance.instance_variable_get(:@usock)
@@ -1060,7 +1047,7 @@ EOL
     assert servers.find{|s| s.title == :out_forward_heartbeat_receiver }
     assert timers.include?(:out_forward_heartbeat_request)
 
-    mock(usock).send("\0", 0, Socket.pack_sockaddr_in(@target_port, '127.0.0.1')).once
+    mock(usock).send("\0", 0, Socket.pack_sockaddr_in(TARGET_PORT, '127.0.0.1')).once
     d.instance.send(:on_heartbeat_timer)
   end
 
@@ -1086,7 +1073,7 @@ EOL
   test 'when out_forward has @id' do
     # cancel https://github.com/fluent/fluentd/blob/077508ac817b7637307434d0c978d7cdc3d1c534/lib/fluent/plugin_id.rb#L43-L53
     # it always return true in test
-    mock.proxy(Fluent::Plugin).new_sd('static', parent: anything) { |v|
+    mock.proxy(Fluent::Plugin).new_sd(:static, parent: anything) { |v|
       stub(v).plugin_id_for_test? { false }
     }.once
 
@@ -1097,7 +1084,7 @@ EOL
     }
 
     assert_nothing_raised do
-      output.configure(config + %[
+      output.configure(CONFIG + %[
         @id unique_out_forward
       ])
     end
@@ -1105,7 +1092,7 @@ EOL
 
   sub_test_case 'verify_connection_at_startup' do
     test 'nodes are not available' do
-      @d = d = create_driver(config + %[
+      @d = d = create_driver(CONFIG + %[
         verify_connection_at_startup true
       ])
       e = assert_raise Fluent::UnrecoverableError do
@@ -1121,7 +1108,7 @@ EOL
     end
 
     test 'nodes_shared_key_miss_match' do
-      input_conf = target_config + %[
+      input_conf = TARGET_CONFIG + %[
                    <security>
                      self_hostname in.localhost
                      shared_key fluentd-sharedkey
@@ -1138,7 +1125,7 @@ EOL
 
         <server>
           host #{TARGET_HOST}
-          port #{@target_port}
+          port #{TARGET_PORT}
         </server>
       ]
       @d = d = create_driver(output_conf)
@@ -1152,7 +1139,7 @@ EOL
     end
 
     test 'nodes_shared_key_miss_match with TLS' do
-      input_conf = target_config + %[
+      input_conf = TARGET_CONFIG + %[
                    <security>
                      self_hostname in.localhost
                      shared_key fluentd-sharedkey
@@ -1173,7 +1160,7 @@ EOL
 
         <server>
           host #{TARGET_HOST}
-          port #{@target_port}
+          port #{TARGET_PORT}
         </server>
       ]
       @d = d = create_driver(output_conf)
@@ -1188,7 +1175,7 @@ EOL
     end
 
     test 'nodes_shared_key_match' do
-      input_conf = target_config + %[
+      input_conf = TARGET_CONFIG + %[
                        <security>
                          self_hostname in.localhost
                          shared_key fluentd-sharedkey
@@ -1204,7 +1191,7 @@ EOL
           <server>
             name test
             host #{TARGET_HOST}
-            port #{@target_port}
+            port #{TARGET_PORT}
           </server>
       ]
       @d = d = create_driver(output_conf)
@@ -1228,19 +1215,16 @@ EOL
   end
 
   test 'Create new connection per send_data' do
-    target_input_driver = create_target_input_driver(conf: target_config)
-    output_conf = config
+    omit "Proxy of RR doesn't support kwargs of Ruby 3 yet" if RUBY_VERSION.split('.')[0].to_i >= 3
+
+    target_input_driver = create_target_input_driver(conf: TARGET_CONFIG)
+    output_conf = CONFIG
     d = create_driver(output_conf)
     d.instance_start
 
     begin
       chunk = Fluent::Plugin::Buffer::MemoryChunk.new(Fluent::Plugin::Buffer::Metadata.new(nil, nil, nil))
-      mock.proxy(d.instance).socket_create_tcp(TARGET_HOST, @target_port,
-                                               linger_timeout: anything,
-                                               send_timeout: anything,
-                                               recv_timeout: anything,
-                                               connect_timeout: anything
-                                              ) { |sock| mock(sock).close.once; sock }.twice
+      mock.proxy(d.instance).socket_create_tcp(TARGET_HOST, TARGET_PORT, anything) { |sock| mock(sock).close.once; sock }.twice
 
       target_input_driver.run(timeout: 15) do
         d.run(shutdown: false) do
@@ -1262,7 +1246,7 @@ EOL
       name test
       standby
       host #{TARGET_HOST}
-      port #{@target_port}
+      port #{TARGET_PORT}
     </server>
     ])
     d.instance_start
@@ -1271,8 +1255,10 @@ EOL
 
   sub_test_case 'keepalive' do
     test 'Do not create connection per send_data' do
-      target_input_driver = create_target_input_driver(conf: target_config)
-      output_conf = config + %[
+      omit "Proxy of RR doesn't support kwargs of Ruby 3 yet" if RUBY_VERSION.split('.')[0].to_i >= 3
+
+      target_input_driver = create_target_input_driver(conf: TARGET_CONFIG)
+      output_conf = CONFIG + %[
         keepalive true
         keepalive_timeout 2
       ]
@@ -1281,12 +1267,7 @@ EOL
 
       begin
         chunk = Fluent::Plugin::Buffer::MemoryChunk.new(Fluent::Plugin::Buffer::Metadata.new(nil, nil, nil))
-        mock.proxy(d.instance).socket_create_tcp(TARGET_HOST, @target_port,
-                                                 linger_timeout: anything,
-                                                 send_timeout: anything,
-                                                 recv_timeout: anything,
-                                                 connect_timeout: anything
-                                                ) { |sock| mock(sock).close.once; sock }.once
+        mock.proxy(d.instance).socket_create_tcp(TARGET_HOST, TARGET_PORT, anything) { |sock| mock(sock).close.once; sock }.once
 
         target_input_driver.run(timeout: 15) do
           d.run(shutdown: false) do
@@ -1302,7 +1283,7 @@ EOL
     end
 
     test 'create timer of purging obsolete sockets' do
-      output_conf = config + %[keepalive true]
+      output_conf = CONFIG + %[keepalive true]
       d = create_driver(output_conf)
 
       mock(d.instance).timer_execute(:out_forward_heartbeat_request, 1).once
@@ -1312,8 +1293,8 @@ EOL
 
     sub_test_case 'with require_ack_response' do
       test 'Create connection per send_data' do
-        target_input_driver = create_target_input_driver(conf: target_config)
-        output_conf = config + %[
+        target_input_driver = create_target_input_driver(conf: TARGET_CONFIG)
+        output_conf = CONFIG + %[
           require_ack_response true
           keepalive true
           keepalive_timeout 2
@@ -1323,7 +1304,7 @@ EOL
 
         begin
           chunk = Fluent::Plugin::Buffer::MemoryChunk.new(Fluent::Plugin::Buffer::Metadata.new(nil, nil, nil))
-          mock.proxy(d.instance).socket_create_tcp(TARGET_HOST, @target_port,
+          mock.proxy(d.instance).socket_create_tcp(TARGET_HOST, TARGET_PORT,
                                                    linger_timeout: anything,
                                                    send_timeout: anything,
                                                    recv_timeout: anything,

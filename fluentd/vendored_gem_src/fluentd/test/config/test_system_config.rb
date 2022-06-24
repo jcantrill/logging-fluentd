@@ -28,8 +28,6 @@ module Fluent::Config
         log_event_label: nil,
         log_event_verbose: nil,
         without_source: nil,
-        enable_input_metrics: nil,
-        enable_size_metrics: nil,
         emit_error_log_interval: nil,
         file_permission: nil,
         dir_permission: nil,
@@ -79,8 +77,6 @@ module Fluent::Config
       assert_nil(sc.emit_error_log_interval)
       assert_nil(sc.suppress_config_dump)
       assert_nil(sc.without_source)
-      assert_nil(sc.enable_input_metrics)
-      assert_nil(sc.enable_size_metrics)
       assert_nil(sc.enable_msgpack_time_support)
       assert_equal(:text, sc.log.format)
       assert_equal('%Y-%m-%d %H:%M:%S %z', sc.log.time_format)
@@ -97,8 +93,6 @@ module Fluent::Config
       'without_source' => ['without_source', true],
       'strict_config_value' => ['strict_config_value', true],
       'enable_msgpack_time_support' => ['enable_msgpack_time_support', true],
-      'enable_input_metrics' => ['enable_input_metrics', true],
-      'enable_size_metrics' => ['enable_size_metrics', true],
     )
     test "accepts parameters" do |(k, v)|
       conf = parse_text(<<-EOS)
@@ -148,52 +142,6 @@ module Fluent::Config
       sc = Fluent::SystemConfig.new(conf)
       sc.overwrite_variables(**s.for_system_config)
       assert_equal(level, sc.log_level)
-    end
-
-    sub_test_case "log rotation" do
-      data('daily' => "daily",
-           'weekly' => 'weekly',
-           'monthly' => 'monthly')
-      test "symbols for rotate_age" do |age|
-        conf = parse_text(<<-EOS)
-          <system>
-            <log>
-              rotate_age #{age}
-            </log>
-          </system>
-        EOS
-        sc = Fluent::SystemConfig.new(conf)
-        assert_equal(age.to_sym, sc.log.rotate_age)
-      end
-
-      test "numeric number for rotate age" do
-        conf = parse_text(<<-EOS)
-          <system>
-            <log>
-              rotate_age 3
-            </log>
-          </system>
-        EOS
-        s = FakeSupervisor.new
-        sc = Fluent::SystemConfig.new(conf)
-        assert_equal(3, sc.log.rotate_age)
-      end
-
-      data(h: ['100', 100],
-           k: ['1k', 1024],
-           m: ['1m', 1024 * 1024],
-           g: ['1g', 1024 * 1024 * 1024])
-      test "numeric and SI prefix for rotate_size" do |(label, size)|
-        conf = parse_text(<<-EOS)
-          <system>
-            <log>
-              rotate_size #{label}
-            </log>
-          </system>
-        EOS
-        sc = Fluent::SystemConfig.new(conf)
-        assert_equal(size, sc.log.rotate_size)
-      end
     end
   end
 end

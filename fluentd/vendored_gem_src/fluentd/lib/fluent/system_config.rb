@@ -27,8 +27,7 @@ module Fluent
       :log_event_verbose, :ignore_repeated_log_interval, :ignore_same_log_interval,
       :without_source, :rpc_endpoint, :enable_get_dump, :process_name,
       :file_permission, :dir_permission, :counter_server, :counter_client,
-      :strict_config_value, :enable_msgpack_time_support, :disable_shared_socket,
-      :metrics, :enable_input_metrics, :enable_size_metrics
+      :strict_config_value, :enable_msgpack_time_support, :disable_shared_socket
     ]
 
     config_param :workers,   :integer, default: 1
@@ -47,8 +46,6 @@ module Fluent
     config_param :strict_config_value, :bool, default: nil
     config_param :enable_msgpack_time_support, :bool, default: nil
     config_param :disable_shared_socket, :bool, default: nil
-    config_param :enable_input_metrics, :bool, default: nil
-    config_param :enable_size_metrics, :bool, default: nil
     config_param :file_permission, default: nil do |v|
       v.to_i(8)
     end
@@ -58,20 +55,6 @@ module Fluent
     config_section :log, required: false, init: true, multi: false do
       config_param :format, :enum, list: [:text, :json], default: :text
       config_param :time_format, :string, default: '%Y-%m-%d %H:%M:%S %z'
-      config_param :rotate_age, default: nil do |v|
-        if Fluent::Log::LOG_ROTATE_AGE.include?(v)
-          v.to_sym
-        else
-          begin
-            Integer(v)
-          rescue ArgumentError => e
-            raise Fluent::ConfigError, e.message
-          else
-            v.to_i
-          end
-        end
-      end
-      config_param :rotate_size, :size, default: nil
     end
 
     config_section :counter_server, multi: false do
@@ -94,11 +77,6 @@ module Fluent
       config_param :host, :string
       desc 'the timeout of each operation'
       config_param :timeout, :time, default: nil
-    end
-
-    config_section :metrics, multi: false do
-      config_param :@type, :string, default: "local"
-      config_param :labels, :hash, default: {}
     end
 
     def self.create(conf, strict_config_value=false)

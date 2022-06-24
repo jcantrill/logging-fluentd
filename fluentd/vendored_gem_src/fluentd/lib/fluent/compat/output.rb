@@ -310,7 +310,7 @@ module Fluent
       # original implementation of v0.12 BufferedOutput
       def emit(tag, es, chain, key="")
         # this method will not be used except for the case that plugin calls super
-        @emit_count_metrics.inc
+        @emit_count += 1
         data = format_stream(tag, es)
         if @buffer.emit(key, data, chain)
           submit_flush
@@ -337,14 +337,14 @@ module Fluent
       # because v0.12 BufferedOutput may overrides #format_stream, but original #handle_stream_simple method doesn't consider about it
       def handle_stream_simple(tag, es, enqueue: false)
         if @overrides_emit
-          current_emit_count = @emit_count_metrics.get
+          current_emit_count = @emit_count
           size = es.size
           key = data = nil
           begin
             emit(tag, es, NULL_OUTPUT_CHAIN)
             key, data = self.last_emit_via_buffer
           ensure
-            @emit_count_metrics.set(current_emit_count)
+            @emit_count = current_emit_count
             self.last_emit_via_buffer = nil
           end
           # on-the-fly key assignment can be done, and it's not configurable if Plugin#emit does it dynamically
@@ -352,8 +352,7 @@ module Fluent
           write_guard do
             @buffer.write({meta => data}, format: ->(_data){ _data }, size: ->(){ size }, enqueue: enqueue)
           end
-          @emit_records_metrics.add(es.size)
-          @emit_size_metrics.add(es.to_msgpack_stream.bytesize) if @enable_size_metrics
+          @counter_mutex.synchronize{ @emit_records += size }
           return [meta]
         end
 
@@ -364,8 +363,7 @@ module Fluent
           write_guard do
             @buffer.write({meta => bulk}, format: ->(_data){ _data }, size: ->(){ size }, enqueue: enqueue)
           end
-          @emit_records_metrics.add(es.size)
-          @emit_size_metrics.add(es.to_msgpack_stream.bytesize) if @enable_size_metrics
+          @counter_mutex.synchronize{ @emit_records += size }
           return [meta]
         end
 
@@ -375,8 +373,7 @@ module Fluent
         write_guard do
           @buffer.write({meta => data}, enqueue: enqueue)
         end
-        @emit_records_metrics.add(es.size)
-        @emit_size_metrics.add(es.to_msgpack_stream.bytesize) if @enable_size_metrics
+        @counter_mutex.synchronize{ @emit_records += size }
         [meta]
       end
 

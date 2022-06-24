@@ -5,51 +5,42 @@ require 'fluent/plugin/in_syslog'
 class SyslogInputTest < Test::Unit::TestCase
   def setup
     Fluent::Test.setup
-    @port = unused_port
   end
 
-  def teardown
-    @port = nil
-  end
+  PORT = unused_port
+  CONFIG = %[
+    port #{PORT}
+    bind 127.0.0.1
+    tag syslog
+  ]
 
-  def ipv4_config
-    %[
-      port #{@port}
-      bind 127.0.0.1
-      tag syslog
-    ]
-  end
+  IPv6_CONFIG = %[
+    port #{PORT}
+    bind ::1
+    tag syslog
+  ]
 
-  def ipv6_config
-    %[
-      port #{@port}
-      bind ::1
-      tag syslog
-    ]
-  end
-
-  def create_driver(conf=ipv4_config)
+  def create_driver(conf=CONFIG)
     Fluent::Test::Driver::Input.new(Fluent::Plugin::SyslogInput).configure(conf)
   end
 
   data(
-    ipv4: ['127.0.0.1', :ipv4, ::Socket::AF_INET],
-    ipv6: ['::1', :ipv6, ::Socket::AF_INET6],
+    ipv4: ['127.0.0.1', CONFIG, ::Socket::AF_INET],
+    ipv6: ['::1', IPv6_CONFIG, ::Socket::AF_INET6],
   )
   def test_configure(data)
-    bind_addr, protocol, family = data
-    config = send("#{protocol}_config")
+    bind_addr, config, family = data
     omit "IPv6 unavailable" if family == ::Socket::AF_INET6 && !ipv6_enabled?
 
     d = create_driver(config)
-    assert_equal @port, d.instance.port
+    assert_equal PORT, d.instance.port
     assert_equal bind_addr, d.instance.bind
   end
 
   sub_test_case 'source_hostname_key and source_address_key features' do
     test 'resolve_hostname must be true with source_hostname_key' do
       assert_raise(Fluent::ConfigError) {
-        create_driver(ipv4_config + <<EOS)
+        create_driver(CONFIG + <<EOS)
 resolve_hostname false
 source_hostname_key hostname
 EOS
@@ -59,7 +50,7 @@ EOS
     data('resolve_hostname' => 'resolve_hostname true',
          'source_hostname_key' => 'source_hostname_key source_host')
     def test_configure_resolve_hostname(param)
-      d = create_driver([ipv4_config, param].join("\n"))
+      d = create_driver([CONFIG, param].join("\n"))
       assert_true d.instance.resolve_hostname
     end
   end
@@ -69,7 +60,7 @@ EOS
        'Use transport and protocol' => ["protocol_type udp\n<transport tcp>\n </transport>", :udp, :tcp])
   def test_configure_protocol(param)
     conf, proto_type, transport_proto_type = *param
-    d = create_driver([ipv4_config, conf].join("\n"))
+    d = create_driver([CONFIG, conf].join("\n"))
 
     assert_equal(d.instance.protocol_type, proto_type)
     assert_equal(d.instance.transport_config.protocol, transport_proto_type)
@@ -77,12 +68,12 @@ EOS
 
   # For backward compat
   def test_respect_protocol_type_than_transport
-    d = create_driver([ipv4_config, "<transport tcp> \n</transport>", "protocol_type udp"].join("\n"))
+    d = create_driver([CONFIG, "<transport tcp> \n</transport>", "protocol_type udp"].join("\n"))
     tests = create_test_case
 
     d.run(expect_emits: 2) do
       u = UDPSocket.new
-      u.connect('127.0.0.1', @port)
+      u.connect('127.0.0.1', PORT)
       tests.each {|test|
         u.send(test['msg'], 0)
       }
@@ -94,12 +85,11 @@ EOS
 
 
   data(
-    ipv4: ['127.0.0.1', :ipv4, ::Socket::AF_INET],
-    ipv6: ['::1', :ipv6, ::Socket::AF_INET6],
+    ipv4: ['127.0.0.1', CONFIG, ::Socket::AF_INET],
+    ipv6: ['::1', IPv6_CONFIG, ::Socket::AF_INET6],
   )
   def test_time_format(data)
-    bind_addr, protocol, family = data
-    config = send("#{protocol}_config")
+    bind_addr, config, family = data
     omit "IPv6 unavailable" if family == ::Socket::AF_INET6 && !ipv6_enabled?
 
     d = create_driver(config)
@@ -110,7 +100,7 @@ EOS
     ]
     d.run(expect_emits: 2) do
       u = UDPSocket.new(family)
-      u.connect(bind_addr, @port)
+      u.connect(bind_addr, PORT)
       tests.each {|test|
         u.send(test['msg'], 0)
       }
@@ -129,7 +119,7 @@ EOS
 
     d.run(expect_emits: 2) do
       u = UDPSocket.new
-      u.connect('127.0.0.1', @port)
+      u.connect('127.0.0.1', PORT)
       tests.each {|test|
         u.send(test['msg'], 0)
       }
@@ -140,14 +130,14 @@ EOS
   end
 
   def test_msg_size_udp_for_large_msg
-    d = create_driver(ipv4_config + %[
+    d = create_driver(CONFIG + %[
       message_length_limit 5k
     ])
     tests = create_test_case(large_message: true)
 
     d.run(expect_emits: 3) do
       u = UDPSocket.new
-      u.connect('127.0.0.1', @port)
+      u.connect('127.0.0.1', PORT)
       tests.each {|test|
         u.send(test['msg'], 0)
       }
@@ -158,12 +148,12 @@ EOS
   end
 
   def test_msg_size_with_tcp
-    d = create_driver([ipv4_config, "<transport tcp> \n</transport>"].join("\n"))
+    d = create_driver([CONFIG, "<transport tcp> \n</transport>"].join("\n"))
     tests = create_test_case
 
     d.run(expect_emits: 2) do
       tests.each {|test|
-        TCPSocket.open('127.0.0.1', @port) do |s|
+        TCPSocket.open('127.0.0.1', PORT) do |s|
           s.send(test['msg'], 0)
         end
       }
@@ -174,12 +164,12 @@ EOS
   end
 
   def test_emit_rfc5452
-    d = create_driver([ipv4_config, "facility_key pri\n<parse>\n message_format rfc5424\nwith_priority true\n</parse>"].join("\n"))
+    d = create_driver([CONFIG, "facility_key pri\n<parse>\n message_format rfc5424\nwith_priority true\n</parse>"].join("\n"))
     msg = '<1>1 2017-02-06T13:14:15.003Z myhostname 02abaf0687f5 10339 02abaf0687f5 - method=POST db=0.00'
 
     d.run(expect_emits: 1, timeout: 2) do
       u = UDPSocket.new
-      u.connect('127.0.0.1', @port)
+      u.connect('127.0.0.1', PORT)
       u.send(msg, 0)
     end
 
@@ -189,11 +179,11 @@ EOS
   end
 
   def test_msg_size_with_same_tcp_connection
-    d = create_driver([ipv4_config, "<transport tcp> \n</transport>"].join("\n"))
+    d = create_driver([CONFIG, "<transport tcp> \n</transport>"].join("\n"))
     tests = create_test_case
 
     d.run(expect_emits: 2) do
-      TCPSocket.open('127.0.0.1', @port) do |s|
+      TCPSocket.open('127.0.0.1', PORT) do |s|
         tests.each {|test|
           s.send(test['msg'], 0)
         }
@@ -205,7 +195,7 @@ EOS
   end
 
   def test_msg_size_with_json_format
-    d = create_driver([ipv4_config, 'format json'].join("\n"))
+    d = create_driver([CONFIG, 'format json'].join("\n"))
     time = Time.parse('2013-09-18 12:00:00 +0900').to_i
     tests = ['Hello!', 'Syslog!'].map { |msg|
       event = {'time' => time, 'message' => msg}
@@ -214,7 +204,7 @@ EOS
 
     d.run(expect_emits: 2) do
       u = UDPSocket.new
-      u.connect('127.0.0.1', @port)
+      u.connect('127.0.0.1', PORT)
       tests.each {|test|
         u.send(test['msg'], 0)
       }
@@ -225,13 +215,13 @@ EOS
   end
 
   def test_msg_size_with_include_source_host
-    d = create_driver([ipv4_config, 'include_source_host true'].join("\n"))
+    d = create_driver([CONFIG, 'include_source_host true'].join("\n"))
     tests = create_test_case
 
     host = nil
     d.run(expect_emits: 2) do
       u = UDPSocket.new
-      u.connect('127.0.0.1', @port)
+      u.connect('127.0.0.1', PORT)
       host = u.peeraddr[2]
       tests.each {|test|
         u.send(test['msg'], 0)
@@ -247,13 +237,13 @@ EOS
     priority_key: 'priority_key',
   )
   def test_msg_size_with_severity_key(param_name)
-    d = create_driver([ipv4_config, "#{param_name} severity"].join("\n"))
+    d = create_driver([CONFIG, "#{param_name} severity"].join("\n"))
     tests = create_test_case
 
     severity = 'info'
     d.run(expect_emits: 2) do
       u = UDPSocket.new
-      u.connect('127.0.0.1', @port)
+      u.connect('127.0.0.1', PORT)
       tests.each {|test|
         u.send(test['msg'], 0)
       }
@@ -264,13 +254,13 @@ EOS
   end
 
   def test_msg_size_with_facility_key
-    d = create_driver([ipv4_config, 'facility_key facility'].join("\n"))
+    d = create_driver([CONFIG, 'facility_key facility'].join("\n"))
     tests = create_test_case
 
     facility = 'kern'
     d.run(expect_emits: 2) do
       u = UDPSocket.new
-      u.connect('127.0.0.1', @port)
+      u.connect('127.0.0.1', PORT)
       tests.each {|test|
         u.send(test['msg'], 0)
       }
@@ -281,13 +271,13 @@ EOS
   end
 
   def test_msg_size_with_source_address_key
-    d = create_driver([ipv4_config, 'source_address_key source_address'].join("\n"))
+    d = create_driver([CONFIG, 'source_address_key source_address'].join("\n"))
     tests = create_test_case
 
     address = nil
     d.run(expect_emits: 2) do
       u = UDPSocket.new
-      u.connect('127.0.0.1', @port)
+      u.connect('127.0.0.1', PORT)
       address = u.peeraddr[3]
       tests.each {|test|
         u.send(test['msg'], 0)
@@ -299,14 +289,14 @@ EOS
   end
 
   def test_msg_size_with_source_hostname_key
-    d = create_driver([ipv4_config, 'source_hostname_key source_hostname'].join("\n"))
+    d = create_driver([CONFIG, 'source_hostname_key source_hostname'].join("\n"))
     tests = create_test_case
 
     hostname = nil
     d.run(expect_emits: 2) do
       u = UDPSocket.new
       u.do_not_reverse_lookup = false
-      u.connect('127.0.0.1', @port)
+      u.connect('127.0.0.1', PORT)
       hostname = u.peeraddr[2]
       tests.each {|test|
         u.send(test['msg'], 0)
@@ -347,12 +337,12 @@ EOS
 
   sub_test_case 'octet counting frame' do
     def test_msg_size_with_tcp
-      d = create_driver([ipv4_config, "<transport tcp> \n</transport>", 'frame_type octet_count'].join("\n"))
+      d = create_driver([CONFIG, "<transport tcp> \n</transport>", 'frame_type octet_count'].join("\n"))
       tests = create_test_case
 
       d.run(expect_emits: 2) do
         tests.each {|test|
-          TCPSocket.open('127.0.0.1', @port) do |s|
+          TCPSocket.open('127.0.0.1', PORT) do |s|
             s.send(test['msg'], 0)
           end
         }
@@ -363,11 +353,11 @@ EOS
     end
 
     def test_msg_size_with_same_tcp_connection
-      d = create_driver([ipv4_config, "<transport tcp> \n</transport>", 'frame_type octet_count'].join("\n"))
+      d = create_driver([CONFIG, "<transport tcp> \n</transport>", 'frame_type octet_count'].join("\n"))
       tests = create_test_case
 
       d.run(expect_emits: 2) do
-        TCPSocket.open('127.0.0.1', @port) do |s|
+        TCPSocket.open('127.0.0.1', PORT) do |s|
           tests.each {|test|
             s.send(test['msg'], 0)
           }
@@ -414,13 +404,13 @@ EOS
   end
 
   def test_emit_unmatched_lines
-    d = create_driver([ipv4_config, 'emit_unmatched_lines true'].join("\n"))
+    d = create_driver([CONFIG, 'emit_unmatched_lines true'].join("\n"))
     tests = create_unmatched_lines_test_case
 
     d.run(expect_emits: 3) do
       u = UDPSocket.new
       u.do_not_reverse_lookup = false
-      u.connect('127.0.0.1', @port)
+      u.connect('127.0.0.1', PORT)
       tests.each {|test|
         u.send(test['msg'], 0)
       }
@@ -431,14 +421,14 @@ EOS
   end
 
   def test_emit_unmatched_lines_with_hostname
-    d = create_driver([ipv4_config, 'emit_unmatched_lines true', 'source_hostname_key source_hostname'].join("\n"))
+    d = create_driver([CONFIG, 'emit_unmatched_lines true', 'source_hostname_key source_hostname'].join("\n"))
     tests = create_unmatched_lines_test_case
 
     hostname = nil
     d.run(expect_emits: 3) do
       u = UDPSocket.new
       u.do_not_reverse_lookup = false
-      u.connect('127.0.0.1', @port)
+      u.connect('127.0.0.1', PORT)
       hostname = u.peeraddr[2]
       tests.each {|test|
         u.send(test['msg'], 0)
@@ -450,14 +440,14 @@ EOS
   end
 
   def test_emit_unmatched_lines_with_address
-    d = create_driver([ipv4_config, 'emit_unmatched_lines true', 'source_address_key source_address'].join("\n"))
+    d = create_driver([CONFIG, 'emit_unmatched_lines true', 'source_address_key source_address'].join("\n"))
     tests = create_unmatched_lines_test_case
 
     address = nil
     d.run(expect_emits: 3) do
       u = UDPSocket.new
       u.do_not_reverse_lookup = false
-      u.connect('127.0.0.1', @port)
+      u.connect('127.0.0.1', PORT)
       address = u.peeraddr[3]
       tests.each {|test|
         u.send(test['msg'], 0)
@@ -466,40 +456,5 @@ EOS
 
     assert_equal tests.size, d.events.size
     compare_unmatched_lines_test_result(d.events, tests, {address: address})
-  end
-
-  def test_send_keepalive_packet_is_disabled_by_default
-    d = create_driver(ipv4_config + %[
-      <transport tcp>
-      </transport>
-      protocol tcp
-    ])
-    assert_false d.instance.send_keepalive_packet
-  end
-
-  def test_send_keepalive_packet_can_be_enabled
-    addr = "127.0.0.1"
-    d = create_driver(ipv4_config + %[
-      <transport tcp>
-      </transport>
-      send_keepalive_packet true
-    ])
-    assert_true d.instance.send_keepalive_packet
-    mock.proxy(d.instance).server_create_connection(
-      :in_syslog_tcp_server, @port,
-      bind: addr,
-      resolve_name: nil,
-      send_keepalive_packet: true)
-    d.run do
-      TCPSocket.open(addr, @port)
-    end
-  end
-
-  def test_send_keepalive_packet_can_not_be_enabled_for_udp
-    assert_raise(Fluent::ConfigError) do
-      d = create_driver(ipv4_config + %[
-        send_keepalive_packet true
-      ])
-    end
   end
 end

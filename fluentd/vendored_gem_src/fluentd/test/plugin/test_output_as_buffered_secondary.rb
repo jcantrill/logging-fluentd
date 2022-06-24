@@ -775,7 +775,7 @@ class BufferedOutputSecondaryTest < Test::Unit::TestCase
       assert_equal [ 'test.tag.1', event_time('2016-04-13 18:33:13').to_i, {"name" => "moris", "age" => 36, "message" => "data2"} ], written[1]
       assert_equal [ 'test.tag.1', event_time('2016-04-13 18:33:32').to_i, {"name" => "moris", "age" => 36, "message" => "data3"} ], written[2]
 
-      assert(@i.log.out.logs.any?{|l| l.include?("[warn]: retry succeeded by secondary.") })
+      assert{ @i.log.out.logs.any?{|l| l.include?("[warn]: retry succeeded by secondary.") } }
     end
 
     test 'exponential backoff interval will be initialized when switched to secondary' do
@@ -874,7 +874,7 @@ class BufferedOutputSecondaryTest < Test::Unit::TestCase
       end
 
       logs = @i.log.out.logs
-      assert{ logs.any?{|l| l.include?("[error]: Hit limit for retries. dropping all chunks in the buffer queue.") } }
+      assert{ logs.any?{|l| l.include?("[error]: failed to flush the buffer, and hit limit for retries. dropping all chunks in the buffer queue.") } }
 
       assert{ now >= first_failure + 60 }
     end

@@ -167,8 +167,6 @@ module Fluent::Plugin
       @usock = nil
       @keep_alive_watcher_interval = 5 # TODO
       @suspend_flush = false
-      @healthy_nodes_count_metrics = nil
-      @registered_nodes_count_metrics = nil
     end
 
     def configure(conf)
@@ -229,14 +227,31 @@ module Fluent::Plugin
         socket_cache: socket_cache,
       )
 
-      service_discovery_configure(
+      configs = []
+
+      # rewrite for using server as sd_static
+      conf.elements(name: 'server').each do |s|
+        s.name = 'service'
+      end
+
+      unless conf.elements(name: 'service').empty?
+        # To copy `services` element only
+        new_elem = Fluent::Config::Element.new('static_service_discovery', {}, {}, conf.elements(name: 'service'))
+        configs << { type: :static, conf: new_elem }
+      end
+
+      conf.elements(name: 'service_discovery').each_with_index do |c, i|
+        configs << { type: @service_discovery[i][:@type], conf: c }
+      end
+
+      service_discovery_create_manager(
         :out_forward_service_discovery_watcher,
-        static_default_service_directive: 'server',
+        configurations: configs,
         load_balancer: LoadBalancer.new(log),
         custom_build_method: method(:build_node),
       )
 
-      service_discovery_services.each do |server|
+      discovery_manager.services.each do |server|
         # it's only for test
         @nodes << server
         unless @heartbeat_type == :none
@@ -258,7 +273,7 @@ module Fluent::Plugin
         end
       end
 
-      if service_discovery_services.empty?
+      if discovery_manager.services.empty?
         raise Fluent::ConfigError, "forward output plugin requires at least one node is required. Add <server> or <service_discovery>"
       end
 
@@ -267,9 +282,6 @@ module Fluent::Plugin
       end
 
       raise Fluent::ConfigError, "ack_response_timeout must be a positive integer" if @ack_response_timeout < 1
-      @healthy_nodes_count_metrics = metrics_create(namespace: "fluentd", subsystem: "output", name: "healthy_nodes_count", help_text: "Number of count healthy nodes", prefer_gauge: true)
-      @registered_nodes_count_metrics = metrics_create(namespace: "fluentd", subsystem: "output", name: "registered_nodes_count", help_text: "Number of count registered nodes", prefer_gauge: true)
-
     end
 
     def multi_workers_ready?
@@ -294,7 +306,7 @@ module Fluent::Plugin
 
       unless @heartbeat_type == :none
         if @heartbeat_type == :udp
-          @usock = socket_create_udp(service_discovery_services.first.host, service_discovery_services.first.port, nonblock: true)
+          @usock = socket_create_udp(discovery_manager.services.first.host, discovery_manager.services.first.port, nonblock: true)
           server_create_udp(:out_forward_heartbeat_receiver, 0, socket: @usock, max_bytes: @read_length, &method(:on_udp_heatbeat_response_recv))
         end
         timer_execute(:out_forward_heartbeat_request, @heartbeat_interval, &method(:on_heartbeat_timer))
@@ -306,7 +318,7 @@ module Fluent::Plugin
       end
 
       if @verify_connection_at_startup
-        service_discovery_services.each do |node|
+        discovery_manager.services.each do |node|
           begin
             node.verify_connection
           rescue StandardError => e
@@ -362,7 +374,7 @@ module Fluent::Plugin
       return if chunk.empty?
       tag = chunk.metadata.tag
 
-      service_discovery_select_service { |node| node.send_data(tag, chunk) }
+      discovery_manager.select_service { |node| node.send_data(tag, chunk) }
     end
 
     def try_write(chunk)
@@ -372,7 +384,7 @@ module Fluent::Plugin
         return
       end
       tag = chunk.metadata.tag
-      service_discovery_select_service { |node| node.send_data(tag, chunk) }
+      discovery_manager.select_service { |node| node.send_data(tag, chunk) }
       last_ack if @require_ack_response && @suspend_flush
     end
 
@@ -422,22 +434,19 @@ module Fluent::Plugin
 
     def statistics
       stats = super
-      services = service_discovery_services
-      @healthy_nodes_count_metrics.set(0)
-      @registered_nodes_count_metrics.set(services.size)
+      services = discovery_manager.services
+      healthy_nodes_count = 0
+      registed_nodes_count = services.size
       services.each do |s|
         if s.available?
-          @healthy_nodes_count_metrics.inc
+          healthy_nodes_count += 1
         end
       end
 
-      stats = {
-        'output' => stats["output"].merge({
-          'healthy_nodes_count' => @healthy_nodes_count_metrics.get,
-          'registered_nodes_count' => @registered_nodes_count_metrics.get,
-        })
-      }
-      stats
+      stats.merge(
+        'healthy_nodes_count' => healthy_nodes_count,
+        'registered_nodes_count' => registed_nodes_count,
+      )
     end
 
     # MessagePack FixArray length is 3
@@ -462,7 +471,7 @@ module Fluent::Plugin
 
     def on_heartbeat_timer
       need_rebuild = false
-      service_discovery_services.each do |n|
+      discovery_manager.services.each do |n|
         begin
           log.trace "sending heartbeat", host: n.host, port: n.port, heartbeat_type: @heartbeat_type
           n.usock = @usock if @usock
@@ -477,16 +486,16 @@ module Fluent::Plugin
       end
 
       if need_rebuild
-        service_discovery_rebalance
+        discovery_manager.rebalance
       end
     end
 
     def on_udp_heatbeat_response_recv(data, sock)
       sockaddr = Socket.pack_sockaddr_in(sock.remote_port, sock.remote_host)
-      if node = service_discovery_services.find { |n| n.sockaddr == sockaddr }
+      if node = discovery_manager.services.find { |n| n.sockaddr == sockaddr }
         # log.trace "heartbeat arrived", name: node.name, host: node.host, port: node.port
         if node.heartbeat
-          service_discovery_rebalance
+          discovery_manager.rebalance
         end
       else
         log.warn("Unknown heartbeat response received from #{sock.remote_host}:#{sock.remote_port}. It may service out")
@@ -573,6 +582,8 @@ module Fluent::Plugin
           username: server.username || '',
         )
 
+        @unpacker = Fluent::MessagePackFactory.msgpack_unpacker
+
         @resolved_host = nil
         @resolved_time = 0
         @resolved_once = false
@@ -619,7 +630,7 @@ module Fluent::Plugin
               sleep @sender.read_interval
               next
             end
-            Fluent::MessagePackFactory.msgpack_unpacker.feed_each(buf) do |data|
+            @unpacker.feed_each(buf) do |data|
               if @handshake.invoke(sock, ri, data) == :established
                 @log.debug "connection established", host: @host, port: @port
               end

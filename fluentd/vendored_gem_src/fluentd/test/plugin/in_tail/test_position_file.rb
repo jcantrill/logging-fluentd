@@ -22,10 +22,6 @@ class IntailPositionFileTest < Test::Unit::TestCase
     invalidpath100000000000000000000000000000000
     unwatched\t#{UNWATCHED_STR}\t0000000000000000
   EOF
-  TEST_CONTENT_PATHS = {
-    "valid_path" => Fluent::Plugin::TailInput::TargetInfo.new("valid_path", 1),
-    "inode23bit" => Fluent::Plugin::TailInput::TargetInfo.new("inode23bit", 0),
-  }
 
   def write_data(f, content)
     f.write(content)
@@ -40,11 +36,7 @@ class IntailPositionFileTest < Test::Unit::TestCase
 
   test '.load' do
     write_data(@file, TEST_CONTENT)
-    paths = {
-      "valid_path" => Fluent::Plugin::TailInput::TargetInfo.new("valid_path", 1),
-      "inode23bit" => Fluent::Plugin::TailInput::TargetInfo.new("inode23bit", 2),
-    }
-    Fluent::Plugin::TailInput::PositionFile.load(@file, false, TEST_CONTENT_PATHS, **{logger: $log})
+    Fluent::Plugin::TailInput::PositionFile.load(@file, false, {}, **{logger: $log})
 
     @file.seek(0)
     lines = @file.readlines
@@ -56,7 +48,7 @@ class IntailPositionFileTest < Test::Unit::TestCase
   sub_test_case '#try_compact' do
     test 'compact invalid and convert 32 bit inode value' do
       write_data(@file, TEST_CONTENT)
-      Fluent::Plugin::TailInput::PositionFile.new(@file, false, **{logger: $log}).try_compact
+      Fluent::Plugin::TailInput::PositionFile.new(@file, false, {}, **{logger: $log}).try_compact
 
       @file.seek(0)
       lines = @file.readlines
@@ -70,7 +62,7 @@ class IntailPositionFileTest < Test::Unit::TestCase
         valid_path\t0000000000000002\t0000000000000001
         valid_path\t0000000000000003\t0000000000000004
       EOF
-      Fluent::Plugin::TailInput::PositionFile.new(@file, false, **{logger: $log}).try_compact
+      Fluent::Plugin::TailInput::PositionFile.new(@file, false, {}, **{logger: $log}).try_compact
 
       @file.seek(0)
       lines = @file.readlines
@@ -79,7 +71,7 @@ class IntailPositionFileTest < Test::Unit::TestCase
 
     test 'does not change when the file is changed' do
       write_data(@file, TEST_CONTENT)
-      pf = Fluent::Plugin::TailInput::PositionFile.new(@file, false, **{logger: $log})
+      pf = Fluent::Plugin::TailInput::PositionFile.new(@file, false, {}, **{logger: $log})
 
       mock.proxy(pf).fetch_compacted_entries do |r|
         @file.write("unwatched\t#{UNWATCHED_STR}\t0000000000000000\n")
@@ -94,7 +86,7 @@ class IntailPositionFileTest < Test::Unit::TestCase
     end
 
     test 'update seek position of remained position entry' do
-      pf = Fluent::Plugin::TailInput::PositionFile.new(@file, false, **{logger: $log})
+      pf = Fluent::Plugin::TailInput::PositionFile.new(@file, false, {}, **{logger: $log})
       target_info1 = Fluent::Plugin::TailInput::TargetInfo.new('path1', -1)
       target_info2 = Fluent::Plugin::TailInput::TargetInfo.new('path2', -1)
       target_info3 = Fluent::Plugin::TailInput::TargetInfo.new('path3', -1)
@@ -123,35 +115,12 @@ class IntailPositionFileTest < Test::Unit::TestCase
       assert_equal "path3\t#{UNWATCHED_STR}\t0000000000000000\n", lines[1]
       assert_equal 2, lines.size
     end
-
-    test 'should ignore initial existing files on follow_inode' do
-      write_data(@file, TEST_CONTENT)
-      pos_file = Fluent::Plugin::TailInput::PositionFile.load(@file, true, TEST_CONTENT_PATHS, **{logger: $log})
-      @file.seek(0)
-      assert_equal([], @file.readlines)
-
-      @file.seek(0)
-      write_data(@file, TEST_CONTENT)
-      pos_file.try_compact
-
-      @file.seek(0)
-      assert_equal([
-                     "valid_path\t0000000000000002\t0000000000000001\n",
-                     "inode23bit\t0000000000000000\t0000000000000000\n",
-                   ],
-                   @file.readlines)
-    end
   end
 
   sub_test_case '#load' do
     test 'compact invalid and convert 32 bit inode value' do
       write_data(@file, TEST_CONTENT)
-      invalid_path = "invalidpath100000000000000000000000000000000"
-      paths = TEST_CONTENT_PATHS.merge({
-        invalid_path => Fluent::Plugin::TailInput::TargetInfo.new(invalid_path, 0),
-        "unwatched" => Fluent::Plugin::TailInput::TargetInfo.new("unwatched", 0),
-      })
-      Fluent::Plugin::TailInput::PositionFile.load(@file, false, TEST_CONTENT_PATHS, **{logger: $log})
+      Fluent::Plugin::TailInput::PositionFile.load(@file, false, {}, **{logger: $log})
 
       @file.seek(0)
       lines = @file.readlines
@@ -160,21 +129,12 @@ class IntailPositionFileTest < Test::Unit::TestCase
       assert_equal "inode23bit\t0000000000000000\t0000000000000000\n", lines[1]
     end
 
-    test 'compact deleted paths' do
-      write_data(@file, TEST_CONTENT)
-      Fluent::Plugin::TailInput::PositionFile.load(@file, false, {}, **{logger: $log})
-
-      @file.seek(0)
-      lines = @file.readlines
-      assert_equal [], lines
-    end
-
     test 'compact data if duplicated line' do
       write_data(@file, <<~EOF)
         valid_path\t0000000000000002\t0000000000000001
         valid_path\t0000000000000003\t0000000000000004
       EOF
-      Fluent::Plugin::TailInput::PositionFile.new(@file, false, **{logger: $log}).load
+      Fluent::Plugin::TailInput::PositionFile.new(@file, false, {}, **{logger: $log}).load
 
       @file.seek(0)
       lines = @file.readlines
@@ -185,7 +145,7 @@ class IntailPositionFileTest < Test::Unit::TestCase
   sub_test_case '#[]' do
     test 'return entry' do
       write_data(@file, TEST_CONTENT)
-      pf = Fluent::Plugin::TailInput::PositionFile.load(@file, false, TEST_CONTENT_PATHS, **{logger: $log})
+      pf = Fluent::Plugin::TailInput::PositionFile.load(@file, false, {}, **{logger: $log})
 
       valid_target_info = Fluent::Plugin::TailInput::TargetInfo.new('valid_path', File.stat(@file).ino)
       f = pf[valid_target_info]

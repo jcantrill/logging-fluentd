@@ -14,7 +14,6 @@
 #    limitations under the License.
 #
 
-require 'fluent/env'
 require 'fluent/plugin/base'
 require 'fluent/plugin/owned_by_mixin'
 require 'fluent/time'
