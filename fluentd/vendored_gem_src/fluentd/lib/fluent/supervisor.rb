@@ -397,7 +397,6 @@ module Fluent
       log_path = params['log_path']
       chuser = params['chuser']
       chgroup = params['chgroup']
-      chumask = params['chumask']
       log_rotate_age = params['log_rotate_age']
       log_rotate_size = params['log_rotate_size']
 
@@ -437,7 +436,7 @@ module Fluent
         logger_initializer: logger_initializer,
         chuser: chuser,
         chgroup: chgroup,
-        chumask: chumask,
+        chumask: 0,
         suppress_repeated_stacktrace: suppress_repeated_stacktrace,
         ignore_repeated_log_interval: ignore_repeated_log_interval,
         ignore_same_log_interval: ignore_same_log_interval,
@@ -545,7 +544,7 @@ module Fluent
         $log.ignore_same_log_interval = ignore_same_log_interval if ignore_same_log_interval
 
         if @path && log_dir_perm
-          File.chmod(log_dir_perm || Fluent::DEFAULT_DIR_PERMISSION, File.dirname(@path))
+          File.chmod(log_dir_perm || 0755, File.dirname(@path))
         end
       end
 
@@ -566,14 +565,11 @@ module Fluent
         setup_path: nil,
         chuser: nil,
         chgroup: nil,
-        chumask: "0",
         root_dir: nil,
         suppress_interval: 0,
         suppress_repeated_stacktrace: true,
         ignore_repeated_log_interval: nil,
         without_source: nil,
-        enable_input_metrics: nil,
-        enable_size_metrics: nil,
         use_v1_config: true,
         strict_config_value: nil,
         supervise: true,
@@ -605,7 +601,6 @@ module Fluent
       @plugin_dirs = opt[:plugin_dirs]
       @chgroup = opt[:chgroup]
       @chuser = opt[:chuser]
-      @chumask = opt[:chumask]
 
       @log_rotate_age = opt[:log_rotate_age]
       @log_rotate_size = opt[:log_rotate_size]
@@ -654,7 +649,7 @@ module Fluent
           end
         else
           begin
-            FileUtils.mkdir_p(root_dir, mode: @system_config.dir_permission || Fluent::DEFAULT_DIR_PERMISSION)
+            FileUtils.mkdir_p(root_dir, mode: @system_config.dir_permission || 0755)
           rescue => e
             raise Fluent::InvalidRootDirectory, "failed to create root directory:#{root_dir}, #{e.inspect}"
           end
@@ -712,7 +707,7 @@ module Fluent
         create_socket_manager if @standalone_worker
         if @standalone_worker
           ServerEngine::Privilege.change(@chuser, @chgroup)
-          File.umask(@chumask.to_i(8))
+          File.umask(0)
         end
         MessagePackFactory.init(enable_time_support: @system_config.enable_msgpack_time_support)
         Fluent::Engine.init(@system_config)

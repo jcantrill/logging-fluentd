@@ -89,8 +89,6 @@ module Fluent::Plugin
     config_param :source_hostname_key, :string, default: nil
     desc 'Try to resolve hostname from IP addresses or not.'
     config_param :resolve_hostname, :bool, default: nil
-    desc 'Check the remote connection is still available by sending a keepalive packet if this value is true.'
-    config_param :send_keepalive_packet, :bool, default: false
     desc 'The field name of source address of sender.'
     config_param :source_address_key, :string, default: nil
     desc 'The field name of the severity.'
@@ -145,11 +143,6 @@ module Fluent::Plugin
       end
 
       @_event_loop_run_timeout = @blocking_timeout
-
-      protocol = @protocol_type || @transport_config.protocol
-      if @send_keepalive_packet && protocol == :udp
-        raise Fluent::ConfigError, "send_keepalive_packet is available for tcp/tls"
-      end
     end
 
     def multi_workers_ready?
@@ -180,12 +173,7 @@ module Fluent::Plugin
 
       delimiter = octet_count_frame ? " " : @delimiter
       delimiter_size = delimiter.size
-      server_create_connection(
-        tls ? :in_syslog_tls_server : :in_syslog_tcp_server, @port,
-        bind: @bind,
-        resolve_name: @resolve_hostname,
-        send_keepalive_packet: @send_keepalive_packet
-      ) do |conn|
+      server_create_connection(tls ? :in_syslog_tls_server : :in_syslog_tcp_server, @port, bind: @bind, resolve_name: @resolve_hostname) do |conn|
         conn.data do |data|
           buffer = conn.buffer
           buffer << data

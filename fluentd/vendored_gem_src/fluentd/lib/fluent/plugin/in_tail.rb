@@ -38,7 +38,6 @@ module Fluent::Plugin
     helpers :timer, :event_loop, :parser, :compat_parameters
 
     RESERVED_CHARS = ['/', '*', '%'].freeze
-    MetricsInfo = Struct.new(:opened, :closed, :rotated)
 
     class WatcherSetupError < StandardError
       def initialize(msg)
@@ -58,8 +57,6 @@ module Fluent::Plugin
       @pf = nil
       @ignore_list = []
       @shutdown_start_time = nil
-      @metrics = nil
-      @startup = true
     end
 
     desc 'The paths to read. Multiple paths can be specified, separated by comma.'
@@ -113,8 +110,6 @@ module Fluent::Plugin
     config_param :path_timezone, :string, default: nil
     desc 'Follow inodes instead of following file names. Guarantees more stable delivery and allows to use * in path pattern with rotating files'
     config_param :follow_inodes, :bool, default: false
-    desc 'Maximum length of line. The longer line is just skipped.'
-    config_param :max_line_size, :size, default: nil
 
     config_section :parse, required: false, multi: true, init: true, param_name: :parser_configs do
       config_argument :usage, :string, default: 'in_tail_parser'
@@ -196,10 +191,6 @@ module Fluent::Plugin
           @read_bytes_limit_per_second = min_bytes
         end
       end
-      opened_file_metrics = metrics_create(namespace: "fluentd", subsystem: "input", name: "files_opened_total", help_text: "Total number of opened files")
-      closed_file_metrics = metrics_create(namespace: "fluentd", subsystem: "input", name: "files_closed_total", help_text: "Total number of closed files")
-      rotated_file_metrics = metrics_create(namespace: "fluentd", subsystem: "input", name: "files_rotated_total", help_text: "Total number of rotated files")
-      @metrics = MetricsInfo.new(opened_file_metrics, closed_file_metrics, rotated_file_metrics)
     end
 
     def configure_tag
@@ -372,25 +363,19 @@ module Fluent::Plugin
     def refresh_watchers
       target_paths_hash = expand_paths
       existence_paths_hash = existence_path
-      
-      log.debug {
-        target_paths_str = target_paths_hash.collect { |key, target_info| target_info.path }.join(",")
-        existence_paths_str = existence_paths_hash.collect { |key, target_info| target_info.path }.join(",")
-        "tailing paths: target = #{target_paths_str} | existing = #{existence_paths_str}"
-      }
+
+      log.debug { "tailing paths: target = #{target_paths.join(",")} | existing = #{existence_paths.join(",")}" }
 
       unwatched_hash = existence_paths_hash.reject {|key, value| target_paths_hash.key?(key)}
       added_hash = target_paths_hash.reject {|key, value| existence_paths_hash.key?(key)}
 
       stop_watchers(unwatched_hash, immediate: false, unwatched: true) unless unwatched_hash.empty?
       start_watchers(added_hash) unless added_hash.empty?
-      @startup = false if @startup
     end
 
     def setup_watcher(target_info, pe)
       line_buffer_timer_flusher = @multiline_mode ? TailWatcher::LineBufferTimerFlusher.new(log, @multiline_flush_interval, &method(:flush_buffer)) : nil
-      read_from_head = !@startup || @read_from_head
-      tw = TailWatcher.new(target_info, pe, log, read_from_head, @follow_inodes, method(:update_watcher), line_buffer_timer_flusher, method(:io_handler), @metrics)
+      tw = TailWatcher.new(target_info, pe, log, @read_from_head, @follow_inodes, method(:update_watcher), line_buffer_timer_flusher, method(:io_handler))
 
       if @enable_watch_timer
         tt = TimerTrigger.new(1, log) { tw.on_notify }
@@ -398,7 +383,7 @@ module Fluent::Plugin
       end
 
       if @enable_stat_watcher
-        tt = StatWatcher.new(target_info.path, log) { tw.on_notify }
+        tt = StatWatcher.new(path, log) { tw.on_notify }
         tw.register_watcher(tt)
       end
 
@@ -596,14 +581,6 @@ module Fluent::Plugin
 
     # @return true if no error or unrecoverable error happens in emit action. false if got BufferOverflowError
     def receive_lines(lines, tail_watcher)
-      lines = lines.reject do |line|
-        skip_line = @max_line_size ? line.bytesize > @max_line_size : false
-        if skip_line
-          log.warn "received line length is longer than #{@max_line_size}"
-          log.debug "skipped line: #{line.chomp}"
-        end
-        skip_line
-      end
       es = @receive_handler.call(lines, tail_watcher)
       unless es.empty?
         tag = if @tag_prefix || @tag_suffix
@@ -693,19 +670,6 @@ module Fluent::Plugin
       es
     end
 
-    def statistics
-      stats = super
-
-      stats = {
-        'input' => stats["input"].merge({
-          'opened_file_count' => @metrics.opened.get,
-          'closed_file_count' => @metrics.closed.get,
-          'rotated_file_count' => @metrics.rotated.get,
-        })
-      }
-      stats
-    end
-
     private
 
     def io_handler(watcher, path)
@@ -718,7 +682,6 @@ module Fluent::Plugin
         open_on_every_update: @open_on_every_update,
         from_encoding: @from_encoding,
         encoding: @encoding,
-        metrics: @metrics,
         &method(:receive_lines)
       )
     end
@@ -754,7 +717,7 @@ module Fluent::Plugin
     end
 
     class TailWatcher
-      def initialize(target_info, pe, log, read_from_head, follow_inodes, update_watcher, line_buffer_timer_flusher, io_handler_build, metrics)
+      def initialize(target_info, pe, log, read_from_head, follow_inodes, update_watcher, line_buffer_timer_flusher, io_handler_build)
         @path = target_info.path
         @ino = target_info.ino
         @pe = pe || MemoryPositionEntry.new
@@ -766,7 +729,6 @@ module Fluent::Plugin
         @line_buffer_timer_flusher = line_buffer_timer_flusher
         @io_handler = nil
         @io_handler_build = io_handler_build
-        @metrics = metrics
         @watchers = []
       end
 
@@ -800,7 +762,7 @@ module Fluent::Plugin
       end
 
       def eof?
-        @io_handler.nil? || @io_handler.eof?
+        @io_handler.eof?
       end
 
       def on_notify
@@ -893,7 +855,6 @@ module Fluent::Plugin
             @log.info "detected rotation of #{@path}"
             @io_handler = io_handler
           end
-          @metrics.rotated.inc
         end
       end
 
@@ -973,7 +934,7 @@ module Fluent::Plugin
 
         attr_accessor :shutdown_timeout
 
-        def initialize(watcher, path:, read_lines_limit:, read_bytes_limit_per_second:, log:, open_on_every_update:, from_encoding: nil, encoding: nil, metrics:, &receive_lines)
+        def initialize(watcher, path:, read_lines_limit:, read_bytes_limit_per_second:, log:, open_on_every_update:, from_encoding: nil, encoding: nil, &receive_lines)
           @watcher = watcher
           @path = path
           @read_lines_limit = read_lines_limit
@@ -992,7 +953,6 @@ module Fluent::Plugin
           @shutdown_timeout = SHUTDOWN_TIMEOUT
           @shutdown_mutex = Mutex.new
           @eof = false
-          @metrics = metrics
 
           @log.info "following tail of #{@path}"
         end
@@ -1012,7 +972,6 @@ module Fluent::Plugin
           if @io && !@io.closed?
             @io.close
             @io = nil
-            @metrics.closed.inc
           end
         end
 
@@ -1100,15 +1059,11 @@ module Fluent::Plugin
         def open
           io = Fluent::FileWrapper.open(@path)
           io.seek(@watcher.pe.read_pos + @fifo.bytesize)
-          @metrics.opened.inc
           io
         rescue RangeError
           io.close if io
           raise WatcherSetupError, "seek error with #{@path}: file position = #{@watcher.pe.read_pos.to_s(16)}, reading bytesize = #{@fifo.bytesize.to_s(16)}"
-        rescue Errno::EACCES => e
-          @log.warn "#{e}"
-          nil
-        rescue Errno::ENOENT
+        rescue Errno::ENOENT, Errno::EACCES
           nil
         end
 
@@ -1152,10 +1107,6 @@ module Fluent::Plugin
 
         def opened?
           false
-        end
-
-        def eof?
-          true
         end
       end
 

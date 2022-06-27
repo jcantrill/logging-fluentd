@@ -29,9 +29,6 @@ module Fluent
         if @_event_emitter_lazy_init
           @router = @primary_instance.router
         end
-        if @router.respond_to?(:caller_plugin_id=)
-          @router.caller_plugin_id = self.plugin_id
-        end
         @router
       end
 
@@ -50,11 +47,7 @@ module Fluent
 
       def event_emitter_router(label_name)
         if label_name
-          if label_name == "@ROOT"
-            Engine.root_agent.event_router
-          else
-            Engine.root_agent.find_label(label_name).event_router
-          end
+          Engine.root_agent.find_label(label_name).event_router
         elsif self.respond_to?(:as_secondary) && self.as_secondary
           if @primary_instance.has_router?
             @_event_emitter_lazy_init = true

@@ -72,8 +72,8 @@ module Fluent
 
       def string_safe_encoding(str)
         unless str.valid_encoding?
-          str = str.scrub('?')
           log.info "invalid byte sequence is replaced in `#{str}`" if self.respond_to?(:log)
+          str = str.scrub('?')
         end
         yield str
       end

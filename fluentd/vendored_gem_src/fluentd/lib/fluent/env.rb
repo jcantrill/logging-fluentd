@@ -33,8 +33,4 @@ module Fluent
   def self.linux?
     /linux/ === RUBY_PLATFORM
   end
-
-  def self.macos?
-    /darwin/ =~ RUBY_PLATFORM
-  end
 end

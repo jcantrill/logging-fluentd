@@ -69,7 +69,7 @@ class TestFluentCat < ::Test::Unit::TestCase
     def test_cat_json
       d = create_driver
       d.run(expect_records: 1) do
-        Open3.pipeline_w("#{ServerEngine.ruby_bin_path} #{FLUENT_CAT_COMMAND} --port #{@port} json") do |stdin|
+        Open3.pipeline_w("ruby #{FLUENT_CAT_COMMAND} --port #{@port} json") do |stdin|
           stdin.puts('{"key":"value"}')
           stdin.close
         end
@@ -86,7 +86,7 @@ class TestFluentCat < ::Test::Unit::TestCase
       path = d.instance.write(@chunk)
       d = create_driver
       d.run(expect_records: 1) do
-        Open3.pipeline_w("#{ServerEngine.ruby_bin_path} #{FLUENT_CAT_COMMAND} --port #{@port} --format msgpack secondary") do |stdin|
+        Open3.pipeline_w("ruby #{FLUENT_CAT_COMMAND} --port #{@port} --format msgpack secondary") do |stdin|
           stdin.write(File.read(path))
           stdin.close
         end
@@ -94,35 +94,6 @@ class TestFluentCat < ::Test::Unit::TestCase
       event = d.events.first
       assert_equal([1, "secondary", @record],
                    [d.events.size, event.first, event.last])
-    end
-  end
-
-  sub_test_case "send specific event time" do
-    def test_without_event_time
-      event_time = Fluent::EventTime.now
-      d = create_driver
-      d.run(expect_records: 1) do
-        Open3.pipeline_w("#{ServerEngine.ruby_bin_path} #{FLUENT_CAT_COMMAND} --port #{@port} tag") do |stdin|
-          stdin.puts('{"key":"value"}')
-          stdin.close
-        end
-      end
-      event = d.events.first
-      assert_in_delta(event_time.to_f, event[1].to_f, 3.0) # expect command to be finished in 3 seconds
-      assert_equal([1, "tag", true, @record],
-                   [d.events.size, event.first, event_time.to_f < event[1].to_f, event.last])
-    end
-
-    def test_with_event_time
-      event_time = "2021-01-02 13:14:15.0+00:00"
-      d = create_driver
-      d.run(expect_records: 1) do
-        Open3.pipeline_w("#{ServerEngine.ruby_bin_path} #{FLUENT_CAT_COMMAND} --port #{@port} --event-time '#{event_time}' tag") do |stdin|
-          stdin.puts('{"key":"value"}')
-          stdin.close
-        end
-      end
-      assert_equal([["tag", Fluent::EventTime.parse(event_time), @record]], d.events)
     end
   end
 end

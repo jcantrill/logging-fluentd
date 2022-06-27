@@ -349,7 +349,7 @@ module FormatterTest
     include FormatterTest
 
     def test_unknown_format
-      assert_raise NotFoundPluginError do
+      assert_raise ConfigError do
         Fluent::Plugin.new_formatter('unknown')
       end
     end

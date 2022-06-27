@@ -238,7 +238,7 @@ module Fluent::Plugin
       'buffer_queue_length' => ->(){ throw(:skip) unless instance_variable_defined?(:@buffer) && !@buffer.nil? && @buffer.is_a?(::Fluent::Plugin::Buffer); @buffer.queue.size },
       'buffer_timekeys' => ->(){ throw(:skip) unless instance_variable_defined?(:@buffer) && !@buffer.nil? && @buffer.is_a?(::Fluent::Plugin::Buffer); @buffer.timekeys },
       'buffer_total_queued_size' => ->(){ throw(:skip) unless instance_variable_defined?(:@buffer) && !@buffer.nil? && @buffer.is_a?(::Fluent::Plugin::Buffer); @buffer.stage_size + @buffer.queue_size },
-      'retry_count' => ->(){ respond_to?(:num_errors) ? num_errors : nil },
+      'retry_count' => ->(){ instance_variable_defined?(:@num_errors) ? @num_errors : nil },
     }
 
     def all_plugins
@@ -335,9 +335,7 @@ module Fluent::Plugin
       }
 
       if pe.respond_to?(:statistics)
-        obj.merge!(pe.statistics.dig('output') || {})
-        obj.merge!(pe.statistics.dig('filter') || {})
-        obj.merge!(pe.statistics.dig('input') || {})
+        obj.merge!(pe.statistics['output'] || {})
       end
 
       obj['retry'] = get_retry_info(pe.retry) if opts[:with_retry] && pe.instance_variable_defined?(:@retry)

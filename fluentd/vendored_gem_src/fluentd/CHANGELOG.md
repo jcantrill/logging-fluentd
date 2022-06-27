@@ -1,200 +1,4 @@
-# v1.14
-
-## Release v1.14.6 - 2022/03/31
-
-### Enhancement
-
-* Enable server plugins to specify socket-option `SO_LINGER`
-  https://github.com/fluent/fluentd/pull/3644
-* Add `--umask` command line parameter
-  https://github.com/fluent/fluentd/pull/3671
-  https://github.com/fluent/fluentd/pull/3679
-
-### Bug fixes
-
-* Fix metric name typo
-  https://github.com/fluent/fluentd/pull/3630
-  https://github.com/fluent/fluentd/pull/3673
-* Apply modifications in pipeline to the records being passed to `@ERROR` label
-  https://github.com/fluent/fluentd/pull/3631
-* Fix wrong calculation of retry interval
-  https://github.com/fluent/fluentd/pull/3640
-  https://github.com/fluent/fluentd/pull/3649
-  https://github.com/fluent/fluentd/pull/3685
-  https://github.com/fluent/fluentd/pull/3686
-* Support IPv6 address for `rpc_endpoint` in `system` config
-  https://github.com/fluent/fluentd/pull/3641
-
-### Misc
-
-* CI: Support Ruby 3.1 except Windows
-  https://github.com/fluent/fluentd/pull/3619
-* Switch to GitHub Discussions
-  https://github.com/fluent/fluentd/pull/3654
-* Fix CHANGELOG.md heading styles
-  https://github.com/fluent/fluentd/pull/3648
-* Declare `null_value_pattern` as `regexp`
-  https://github.com/fluent/fluentd/pull/3650
-
-## Release v1.14.5 - 2022/02/09
-
-### Enhancement
-
-* Add support for "application/x-ndjson" to `in_http`
-  https://github.com/fluent/fluentd/pull/3616
-* Add support for ucrt binary for Windows
-  https://github.com/fluent/fluentd/pull/3613
-
-### Bug fixes
-
-* Don't retry when `retry_max_times == 0`
-  https://github.com/fluent/fluentd/pull/3608
-* Fix hang-up issue during TLS handshake in `out_forward`
-  https://github.com/fluent/fluentd/pull/3601
-* Bump up required ServerEngine to v2.2.5
-  https://github.com/fluent/fluentd/pull/3599
-* Fix "invalid byte sequence is replaced" warning on Kubernetes
-  https://github.com/fluent/fluentd/pull/3596
-* Fix "ArgumentError: unknown keyword: :logger" on Windows with Ruby 3.1
-  https://github.com/fluent/fluentd/pull/3592
-
-## Release v1.14.4 - 2022/01/06
-
-### Enhancement
-
-* `in_tail`: Add option to skip long lines (`max_line_size`)
-  https://github.com/fluent/fluentd/pull/3565
-
-### Bug fix
-
-* Incorrect BufferChunkOverflowError when each event size is < `chunk_limit_size`
-  https://github.com/fluent/fluentd/pull/3560
-* On macOS with Ruby 2.7/3.0, `out_file` fails to write events if `append` is true.
-  https://github.com/fluent/fluentd/pull/3579
-* test: Fix unstable test cases
-  https://github.com/fluent/fluentd/pull/3574
-  https://github.com/fluent/fluentd/pull/3577
-
-## Release v1.14.3 - 2021/11/26
-
-### Enhancement
-
-* Changed to accept `http_parser.rb` 0.8.0.
-  `http_parser.rb` 0.8.0 is ready for Ractor.
-  https://github.com/fluent/fluentd/pull/3544
-
-### Bug fix
-
-* in_tail: Fixed a bug that no new logs are read when
-  `enable_stat_watcher true` and `enable_watch_timer false` is set.
-  https://github.com/fluent/fluentd/pull/3541
-* in_tail: Fixed a bug that the beginning and initial lines are lost
-  after startup when `read_from_head false` and path includes wildcard '*'.
-  https://github.com/fluent/fluentd/pull/3542
-* Fixed a bug that processing messages were lost when
-  BufferChunkOverflowError was thrown even though only a specific
-  message size exceeds chunk_limit_size.
-  https://github.com/fluent/fluentd/pull/3553
-  https://github.com/fluent/fluentd/pull/3562
-
-### Misc
-
-* Bump up required version of `win32-service` gem.
-  newer version is required to implement additional `fluent-ctl` commands.
-  https://github.com/fluent/fluentd/pull/3556
-
-## Release v1.14.2 - 2021/10/29
-
-IMPORTANT: This release contain the fix for CVE-2021-41186 -
-ReDoS vulnerability in `parser_apache2`.
-This vulnerability is affected from Fluentd v0.14.14 to v1.14.1.
-We recommend to upgrade Fluentd to v1.14.2 or use patched version of
-`parser_apache2` plugin.
-
-### Enhancement
-
-* fluent-cat: Add `--event-time` option to send specified event time for testing.
-  https://github.com/fluent/fluentd/pull/3528
-
-### Bug fix
-
-* Fixed to generate correct epoch timestamp even after switching Daylight Saving Time
-  https://github.com/fluent/fluentd/pull/3524
-* Fixed ReDoS vulnerability in parser_apache2.
-  This vulnerability is caused by a certain pattern of a broken apache log.
-
-## Release v1.14.1 - 2021/09/29
-
-### Enhancement
-
-* in_tail: Added file related metrics.
-  These metrics should be collected same as fluent-bit's in_tail.
-  https://github.com/fluent/fluentd/pull/3504
-* out_forward: Changed to use metrics mechanism for node statistics
-  https://github.com/fluent/fluentd/pull/3506
-
-### Bug fix
-
-* in_tail: Fixed a crash bug that it raise undefined method of eof? error.
-  This error may happen only when `read_bytes_limit_per_second` was specified.
-  https://github.com/fluent/fluentd/pull/3500
-* out_forward: Fixed a bug that node statistics information is not included correctly.
-  https://github.com/fluent/fluentd/pull/3503
-  https://github.com/fluent/fluentd/pull/3507
-* Fixed a error when using `@include` directive
-  It was occurred when http/https scheme URI is used in `@include` directive with Ruby 3.
-  https://github.com/fluent/fluentd/pull/3517
-* out_copy: Fixed to suppress a wrong warning for `ignore_if_prev_success`
-  It didn't work even if a user set it.
-  https://github.com/fluent/fluentd/pull/3515
-* Fixed not to output nanoseconds field of next retry time in warning log
-  Then, inappropriate labels in log are also fixed. (retry_time -> retry_times,
-  next_retry_seconds -> next_retry_time)
-  https://github.com/fluent/fluentd/pull/3518
-
-## Release v1.14.0 - 2021/08/30
-
-### Enhancement
-
-* Added `enable_input_metrics`, `enable_size_metrics` system
-  configuration parameter
-  This feature might need to pay higher CPU cost, so input event metrics
-  features are disabled by default. These features are also enabled by
-  `--enable-input-metrics`,`--enable-size-metrics` command line
-  option.
-  https://github.com/fluent/fluentd/pull/3440
-* Added reserved word `@ROOT` for getting root router.
-  This is incompatible change. Do not use `@ROOT` for label name.
-  https://github.com/fluent/fluentd/pull/3358
-* in_syslog: Added `send_keepalive_packet` option
-  https://github.com/fluent/fluentd/pull/3474
-* in_http: Added `cors_allow_credentials` option.
-  This option tells browsers whether to expose the response to
-  frontend when the credentials mode is "include".
-  https://github.com/fluent/fluentd/pull/3481
-  https://github.com/fluent/fluentd/pull/3491
-
-### Bug fix
-
-* in_tail: Fixed a bug that deleted paths are not removed
-  from pos file by file compaction at start up
-  https://github.com/fluent/fluentd/pull/3467
-* in_tail: Revived a warning message of retrying unaccessible file
-  https://github.com/fluent/fluentd/pull/3478
-* TLSServer: Fixed a crash bug on logging peer host name errors
-  https://github.com/fluent/fluentd/pull/3483
-
-### Misc
-
-* Added metrics plugin mechanism
-  The implementations is changed to use metrics plugin.
-  In the future, 3rd party plugin will be able to handle these metrics.
-  https://github.com/fluent/fluentd/pull/3471
-  https://github.com/fluent/fluentd/pull/3473
-  https://github.com/fluent/fluentd/pull/3479
-  https://github.com/fluent/fluentd/pull/3484
-
-# v1.13
+# v1.13.3
 
 ## Release v1.13.3 - 2021/07/27
 
@@ -215,6 +19,10 @@ We recommend to upgrade Fluentd to v1.14.2 or use patched version of
 
 * Remove needless spaces in a sample config file
   https://github.com/fluent/fluentd/pull/3456
+
+### Enhancement
+
+# v1.13.2
 
 ## Release v1.13.2 - 2021/07/12
 
@@ -251,6 +59,8 @@ We recommend to upgrade Fluentd to v1.14.2 or use patched version of
   by security scanning tools.
   https://github.com/fluent/fluentd/pull/3450
 
+# v1.13.1
+
 ## Release v1.13.1 - 2021/06/25
 
 ### Bug fix
@@ -274,6 +84,8 @@ We recommend to upgrade Fluentd to v1.14.2 or use patched version of
   https://github.com/fluent/fluentd/pull/3398
 * CI: Dropped to run CI for Ruby 2.5
   https://github.com/fluent/fluentd/pull/3412
+
+# v1.13
 
 ## Release v1.13.0 - 2021/05/29
 
@@ -322,7 +134,6 @@ We recommend to upgrade Fluentd to v1.14.2 or use patched version of
 ### Bug fix
 
 * in_tail: Fix a bug that refresh_watcher fails to handle file rotations
-  https://github.com/fluent/fluentd/pull/3393
 
 ## Release v1.12.3 - 2021/04/23
 

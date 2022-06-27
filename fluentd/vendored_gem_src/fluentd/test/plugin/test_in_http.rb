@@ -540,29 +540,6 @@ class HttpInputTest < Test::Unit::TestCase
     assert_equal_event_time time, d.events[1][1]
   end
 
-  def test_application_ndjson
-    d = create_driver
-    events = [
-        ["tag1", 1643935663, "{\"a\":1}\n{\"b\":2}"],
-        ["tag2", 1643935664, "{\"a\":3}\r\n{\"b\":4}"]
-    ]
-
-    expected = [
-        ["tag1", 1643935663, {"a"=>1}],
-        ["tag1", 1643935663, {"b"=>2}],
-        ["tag2", 1643935664, {"a"=>3}],
-        ["tag2", 1643935664, {"b"=>4}]
-    ]
-
-    d.run(expect_records: 1) do
-      events.each do |tag, time, record|
-        res = post("/#{tag}?time=#{time}", record, {"Content-Type"=>"application/x-ndjson"})
-        assert_equal("200", res.code)
-      end
-    end
-    assert_equal(expected, d.events)
-  end
-
   def test_msgpack
     d = create_driver
     time = event_time("2011-01-02 13:14:15 UTC")
@@ -876,46 +853,6 @@ class HttpInputTest < Test::Unit::TestCase
       assert_equal "200", res.code
       assert_equal "http://subdomain.foo.com", res["Access-Control-Allow-Origin"]
       assert_equal "POST", res["Access-Control-Allow-Methods"]
-    end
-  end
-
-  def test_cors_allow_credentials
-    d = create_driver(config + %[
-          cors_allow_origins ["http://foo.com"]
-          cors_allow_credentials
-        ])
-    assert_equal true, d.instance.cors_allow_credentials
-
-    time = event_time("2011-01-02 13:14:15 UTC")
-    event = ["tag1", time, {"a"=>1}]
-    res_code = nil
-    res_header = nil
-
-    d.run do
-      res = post("/#{event[0]}", {"json"=>event[2].to_json, "time"=>time.to_i.to_s}, {"Origin"=>"http://foo.com"})
-      res_code = res.code
-      res_header = res["Access-Control-Allow-Credentials"]
-    end
-    assert_equal(
-      {
-        response_code: "200",
-        allow_credentials_header: "true",
-        events: [event]
-      },
-      {
-        response_code: res_code,
-        allow_credentials_header: res_header,
-        events: d.events
-      }
-    )
-  end
-
-  def test_cors_allow_credentials_for_wildcard_origins
-    assert_raise(Fluent::ConfigError) do
-      create_driver(config + %[
-        cors_allow_origins ["*"]
-        cors_allow_credentials
-      ])
     end
   end
 

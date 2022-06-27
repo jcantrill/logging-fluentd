@@ -31,25 +31,6 @@ describe HTTP::Parser do
     expect(@parser.header_value_type).to eq(:mixed)
   end
 
-  it "should be able to run in non-main ractors" do
-    skip unless Kernel.const_defined?(:Ractor)
-    default_header_value_type = HTTP::Parser.default_header_value_type
-    r = Ractor.new(default_header_value_type) { |type|
-      parser = HTTP::Parser.new(default_header_value_type: type)
-      done = false
-      parser.on_message_complete = proc {
-        done = true
-      }
-      parser <<
-        "GET /ractor HTTP/1.1\r\n" +
-        "Content-Length: 5\r\n" +
-        "\r\n" +
-        "World"
-      done
-    }
-    expect(r.take).to be true
-  end
-
   it "should allow us to set the header value type" do
     [:mixed, :arrays, :strings].each do |type|
       @parser.header_value_type = type
@@ -57,9 +38,6 @@ describe HTTP::Parser do
 
       parser_tmp = HTTP::Parser.new(nil, type)
       expect(parser_tmp.header_value_type).to eq(type)
-
-      parser_tmp2 = HTTP::Parser.new(default_header_value_type: type)
-      expect(parser_tmp2.header_value_type).to eq(type)
     end
   end
 
@@ -406,15 +384,10 @@ describe HTTP::Parser do
         expect(@parser.send("http_minor")).to eq(test["http_minor"])
 
         if test['type'] == 'HTTP_REQUEST'
-          if defined?(JRUBY_VERSION)
-            expect(@parser.send("request_url")).to eq(test["request_url"])
-          else
-            # It's created by rb_str_new(), so that encoding is Encoding::ASCII_8BIT a.k.a Encoding::BINARY
-            expect(@parser.send("request_url")).to eq(test["request_url"].force_encoding(Encoding::ASCII_8BIT))
-          end
+          expect(@parser.send("request_url")).to eq(test["request_url"].force_encoding(Encoding::BINARY))
         else
           expect(@parser.send("status_code")).to eq(test["status_code"])
-          expect(@parser.send("status")).to eq(test["status"].force_encoding(Encoding::ASCII_8BIT)) if !defined?(JRUBY_VERSION)
+          expect(@parser.send("status")).to eq(test["status"].force_encoding(Encoding::BINARY))
         end
 
         expect(@headers.size).to eq(test['num_headers'])

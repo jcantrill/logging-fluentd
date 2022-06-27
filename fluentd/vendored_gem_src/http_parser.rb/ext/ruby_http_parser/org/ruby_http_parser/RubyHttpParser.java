@@ -8,9 +8,6 @@ import http_parser.lolevel.HTTPDataCallback;
 import http_parser.lolevel.ParserSettings;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.jcodings.Encoding;
 import org.jcodings.specific.UTF8Encoding;
@@ -67,6 +64,7 @@ public class RubyHttpParser extends RubyObject {
   private IRubyObject on_body;
   private IRubyObject on_message_complete;
 
+  private IRubyObject status;
   private IRubyObject requestUrl;
   private IRubyObject requestPath;
   private IRubyObject queryString;
@@ -83,10 +81,6 @@ public class RubyHttpParser extends RubyObject {
   private byte[] _last_header;
 
   private static final Encoding UTF8 = UTF8Encoding.INSTANCE;
-
-  private static final List<String> VALUE_TYPES = new ArrayList<String>(
-    Arrays.asList("mixed", "arrays", "strings")
-  );
 
   public RubyHttpParser(final Ruby runtime, RubyClass clazz) {
     super(runtime, clazz);
@@ -112,6 +106,18 @@ public class RubyHttpParser extends RubyObject {
 
   private void initSettings() {
     this.settings = new ParserSettings();
+
+    this.settings.on_status = new HTTPDataCallback() {
+      public int cb(http_parser.lolevel.HTTPParser p, ByteBuffer buf, int pos, int len) {
+        byte[] data = fetchBytes(buf, pos, len);
+        if (runtime.is1_9() || runtime.is2_0()) {
+          ((RubyString) status).cat(data, 0, data.length, UTF8);
+        } else {
+          ((RubyString) status).cat(data);
+        }
+        return 0;
+      }
+    };
 
     this.settings.on_url = new HTTPDataCallback() {
       public int cb(http_parser.lolevel.HTTPParser p, ByteBuffer buf, int pos, int len) {
@@ -209,12 +215,14 @@ public class RubyHttpParser extends RubyObject {
         headers = new RubyHash(runtime);
 
         if (runtime.is1_9() || runtime.is2_0()) {
+          status = RubyString.newEmptyString(runtime, UTF8);
           requestUrl = RubyString.newEmptyString(runtime, UTF8);
           requestPath = RubyString.newEmptyString(runtime, UTF8);
           queryString = RubyString.newEmptyString(runtime, UTF8);
           fragment = RubyString.newEmptyString(runtime, UTF8);
           upgradeData = RubyString.newEmptyString(runtime, UTF8);
         } else {
+          status = RubyString.newEmptyString(runtime);
           requestUrl = RubyString.newEmptyString(runtime);
           requestPath = RubyString.newEmptyString(runtime);
           queryString = RubyString.newEmptyString(runtime);
@@ -316,7 +324,8 @@ public class RubyHttpParser extends RubyObject {
     this.parser = new HTTPParser();
     this.parser.HTTP_PARSER_STRICT = true;
     this.headers = null;
-
+    
+    this.status = runtime.getNil();
     this.requestUrl = runtime.getNil();
     this.requestPath = runtime.getNil();
     this.queryString = runtime.getNil();
@@ -453,6 +462,11 @@ public class RubyHttpParser extends RubyObject {
     return headers == null ? runtime.getNil() : headers;
   }
 
+  @JRubyMethod(name = "status")
+  public IRubyObject getStatus() {
+    return status == null ? runtime.getNil() : status;
+  }
+
   @JRubyMethod(name = "request_url")
   public IRubyObject getRequestUrl() {
     return requestUrl == null ? runtime.getNil() : requestUrl;
@@ -481,7 +495,7 @@ public class RubyHttpParser extends RubyObject {
   @JRubyMethod(name = "header_value_type=")
   public IRubyObject set_header_value_type(IRubyObject val) {
     String valString = val.toString();
-    if (!VALUE_TYPES.contains(valString)) {
+    if (valString != "mixed" && valString != "arrays" && valString != "strings") {
       throw runtime.newArgumentError("Invalid header value type");
     }
     header_value_type = val;

@@ -50,7 +50,6 @@ body:
       label: Your Configuration
       description: |
         Write your configuration here. Minimum reproducible fluentd.conf is recommended.
-      render: apache
     validations:
       required: true
   - type: textarea

@@ -80,8 +80,8 @@ module Fluent
         raise ArgumentError, "BUG: block not specified which handles connection" unless block_given?
         raise ArgumentError, "BUG: block must have just one argument" unless block.arity == 1
 
-        if proto == :tcp || proto == :tls
-          socket_options[:linger_timeout] ||= @transport_config&.linger_timeout || 0
+        if proto == :tcp || proto == :tls # default linger_timeout only for server
+          socket_options[:linger_timeout] ||= 0
         end
 
         socket_option_validate!(proto, **socket_options)
@@ -132,8 +132,8 @@ module Fluent
         raise ArgumentError, "BUG: block not specified which handles received data" unless block_given?
         raise ArgumentError, "BUG: block must have 1 or 2 arguments" unless callback.arity == 1 || callback.arity == 2
 
-        if proto == :tcp || proto == :tls
-          socket_options[:linger_timeout] ||= @transport_config&.linger_timeout || 0
+        if proto == :tcp || proto == :tls # default linger_timeout only for server
+          socket_options[:linger_timeout] ||= 0
         end
 
         unless socket
@@ -263,23 +263,6 @@ module Fluent
         include Fluent::Configurable
         config_section :transport, required: false, multi: false, init: true, param_name: :transport_config do
           config_argument :protocol, :enum, list: [:tcp, :tls], default: :tcp
-
-          ### Socket Params ###
-
-          # SO_LINGER 0 to send RST rather than FIN to avoid lots of connections sitting in TIME_WAIT at src.
-          # Set positive value if needing to send FIN on closing.
-          # NOTE:
-            # Socket-options can be specified from each plugin as needed, so most of them is not defined here for now.
-            # This is because there is no positive reason to do so.
-            # `linger_timeout` option in particular needs to be defined here
-            # although it can be specified from each plugin as well.
-            # This is because this helper fixes the default value to `0` for its own reason
-            # and it has a critical effect on the behavior.
-          desc 'The timeout time used to set linger option.'
-          config_param :linger_timeout, :integer, default: 0
-
-          ### TLS Params ###
-
           config_param :version, :enum, list: Fluent::TLS::SUPPORTED_VERSIONS, default: Fluent::TLS::DEFAULT_VERSION
           config_param :min_version, :enum, list: Fluent::TLS::SUPPORTED_VERSIONS, default: nil
           config_param :max_version, :enum, list: Fluent::TLS::SUPPORTED_VERSIONS, default: nil
@@ -726,15 +709,13 @@ module Fluent
                 return true
               end
             rescue Errno::EPIPE, Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::ECONNREFUSED, Errno::EHOSTUNREACH => e
-              peeraddr = (@_handler_socket.peeraddr rescue PEERADDR_FAILED)
               @log.trace "unexpected error before accepting TLS connection",
-                         addr: peeraddr[3], host: peeraddr[2], port: peeraddr[1], error: e
+                         host: @_handler_socket.peeraddr[3], port: @_handler_socket.peeraddr[1], error: e
               close rescue nil
             rescue OpenSSL::SSL::SSLError => e
-              peeraddr = (@_handler_socket.peeraddr rescue PEERADDR_FAILED)
               # Use same log level as on_readable
               @log.warn "unexpected error before accepting TLS connection by OpenSSL",
-                        addr: peeraddr[3], host: peeraddr[2], port: peeraddr[1], error: e
+                        host: @_handler_socket.peeraddr[3], port: @_handler_socket.peeraddr[1], error: e
               close rescue nil
             end
 

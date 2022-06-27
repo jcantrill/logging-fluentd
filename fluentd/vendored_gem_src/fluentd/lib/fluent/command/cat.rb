@@ -35,7 +35,6 @@ format = 'json'
 message_key = 'message'
 time_as_integer = false
 retry_limit = 5
-event_time = nil
 
 op.on('-p', '--port PORT', "fluent tcp port (default: #{port})", Integer) {|i|
   port = i
@@ -79,10 +78,6 @@ op.on('--time-as-integer', "Send time as integer for v0.12 or earlier", TrueClas
 
 op.on('--retry-limit N', "Specify the number of retry limit (default: #{retry_limit})", Integer) {|n|
   retry_limit = n
-}
-
-op.on('--event-time TIME_STRING', "Specify the time expression string (default: nil)") {|v|
-  event_time = v
 }
 
 singleton_class.module_eval do
@@ -139,7 +134,7 @@ class Writer
     end
   end
 
-  def initialize(tag, connector, time_as_integer: false, retry_limit: 5, event_time: nil)
+  def initialize(tag, connector, time_as_integer: false, retry_limit: 5)
     @tag = tag
     @connector = connector
     @socket = false
@@ -153,7 +148,6 @@ class Writer
     @retry_wait = 1
     @retry_limit = retry_limit
     @time_as_integer = time_as_integer
-    @event_time = event_time
 
     super()
   end
@@ -172,11 +166,7 @@ class Writer
       end
     end
 
-    time = if @event_time
-             Fluent::EventTime.parse(@event_time)
-           else
-             Fluent::EventTime.now
-           end
+    time = Fluent::EventTime.now
     time = time.to_i if @time_as_integer
     entry = if secondary_record?(record)
               # Even though secondary contains Fluent::EventTime in record,
@@ -319,7 +309,7 @@ else
   }
 end
 
-w = Writer.new(tag, connector, time_as_integer: time_as_integer, retry_limit: retry_limit, event_time: event_time)
+w = Writer.new(tag, connector, time_as_integer: time_as_integer, retry_limit: retry_limit)
 w.start
 
 case format

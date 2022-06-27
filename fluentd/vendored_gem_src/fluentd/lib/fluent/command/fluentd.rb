@@ -81,10 +81,6 @@ op.on('--group GROUP', "change group") {|s|
   opts[:chgroup] = s
 }
 
-op.on('--umask UMASK', "change umask") {|s|
-  opts[:chumask] = s
-}
-
 op.on('-o', '--log PATH', "log file path") {|s|
   opts[:log_path] = s
 }
@@ -136,14 +132,6 @@ op.on('--use-v0-config', "Use v0 configuration format", TrueClass) {|b|
 
 op.on('--strict-config-value', "Parse config values strictly", TrueClass) {|b|
   opts[:strict_config_value] = b
-}
-
-op.on('--enable-input-metrics', "Enable input plugin metrics on fluentd", TrueClass) {|b|
-  opts[:enable_input_metrics] = b
-}
-
-op.on('--enable-size-metrics', "Enable plugin record size metrics on fluentd", TrueClass) {|b|
-  opts[:enable_size_metrics] = b
 }
 
 op.on('-v', '--verbose', "increase verbose level (-v: debug, -vv: trace)", TrueClass) {|b|

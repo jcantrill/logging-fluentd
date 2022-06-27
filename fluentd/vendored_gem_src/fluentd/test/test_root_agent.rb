@@ -16,8 +16,7 @@ class RootAgentTest < ::Test::Unit::TestCase
 
   data(
     'suppress interval' => [{'emit_error_log_interval' => 30}, {:@suppress_emit_error_log_interval => 30}],
-    'without source' => [{'without_source' => true}, {:@without_source => true}],
-    'enable input metrics' => [{'enable_input_metrics' => true}, {:@enable_input_metrics => true}],
+    'without source' => [{'without_source' => true}, {:@without_source => true}]
     )
   def test_initialize_with_opt(data)
     opt, expected = data
@@ -105,34 +104,6 @@ EOC
 </label>
 EOC
       errmsg = "Section <label @test> appears twice"
-      assert_raise Fluent::ConfigError.new(errmsg) do
-        configure_ra(conf)
-      end
-    end
-
-    test 'raises configuration error for label without name' do
-      conf = <<-EOC
-<label>
-  @type test_out
-</label>
-EOC
-      errmsg = "Missing symbol argument on <label> directive"
-      assert_raise Fluent::ConfigError.new(errmsg) do
-        configure_ra(conf)
-      end
-    end
-
-    test 'raises configuration error for <label @ROOT>' do
-      conf = <<-EOC
-<source>
-  @type test_in
-  @label @ROOT
-</source>
-<label @ROOT>
-  @type test_out
-</label>
-EOC
-      errmsg = "@ROOT for <label> is not permitted, reserved for getting root router"
       assert_raise Fluent::ConfigError.new(errmsg) do
         configure_ra(conf)
       end

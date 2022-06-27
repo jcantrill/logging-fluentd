@@ -22,12 +22,12 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency("msgpack", [">= 1.3.1", "< 2.0.0"])
   gem.add_runtime_dependency("yajl-ruby", ["~> 1.0"])
   gem.add_runtime_dependency("cool.io", [">= 1.4.5", "< 2.0.0"])
-  gem.add_runtime_dependency("serverengine", [">= 2.2.5", "< 3.0.0"])
-  gem.add_runtime_dependency("http_parser.rb", [">= 0.5.1", "< 0.9.0"])
+  gem.add_runtime_dependency("serverengine", [">= 2.2.2", "< 3.0.0"])
+  gem.add_runtime_dependency("http_parser.rb", [">= 0.5.1", "< 0.8.0"])
   gem.add_runtime_dependency("sigdump", ["~> 0.2.2"])
   gem.add_runtime_dependency("tzinfo", [">= 1.0", "< 3.0"])
   gem.add_runtime_dependency("tzinfo-data", ["~> 1.0"])
-  gem.add_runtime_dependency("strptime", [">= 0.2.4", "< 1.0.0"])
+  gem.add_runtime_dependency("strptime", [">= 0.2.2", "< 1.0.0"])
   gem.add_runtime_dependency("webrick", [">= 1.4.2", "< 1.8.0"])
 
   # build gem for a certain platform. see also Rakefile
@@ -35,7 +35,7 @@ Gem::Specification.new do |gem|
   gem.platform = fake_platform unless fake_platform.empty?
   if /mswin|mingw/ =~ fake_platform || (/mswin|mingw/ =~ RUBY_PLATFORM && fake_platform.empty?)
     gem.add_runtime_dependency("win32-api", [">= 1.10", "< 2.0.0"])
-    gem.add_runtime_dependency("win32-service", ["~> 2.3.0"])
+    gem.add_runtime_dependency("win32-service", ["~> 2.2.0"])
     gem.add_runtime_dependency("win32-ipc", ["~> 0.7.0"])
     gem.add_runtime_dependency("win32-event", ["~> 0.6.3"])
     gem.add_runtime_dependency("windows-pr", ["~> 1.2.6"])
@@ -51,6 +51,5 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency("test-unit", ["~> 3.3"])
   gem.add_development_dependency("test-unit-rr", ["~> 1.0"])
   gem.add_development_dependency("oj", [">= 2.14", "< 4"])
-  gem.add_development_dependency("async", "~> 1.23")
   gem.add_development_dependency("async-http", ">= 0.50.0")
 end
