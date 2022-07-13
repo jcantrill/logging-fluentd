@@ -346,7 +346,8 @@ module Fluent
     end
 
     def check_for_match_and_format(tag, time, record)
-      return unless @formatters
+      # return unless @formatters
+      return unless @formatters.length > 0
       return if @formatter_cache_nomatch[tag]
       fmtr = @formatter_cache[tag]
       unless fmtr
