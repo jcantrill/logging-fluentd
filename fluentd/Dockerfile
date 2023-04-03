@@ -1,13 +1,11 @@
 ### This is a generated file from Dockerfile.in ###
-#@follow_tag(registry.redhat.io/ubi8/ruby-27:latest)
-FROM registry.access.redhat.com/ubi8/ruby-27 AS builder
+FROM registry-proxy.engineering.redhat.com/rh-osbs/ubi9-ruby-31:1-36 AS builder
 
 ENV REMOTE_SOURCES=${REMOTE_SOURCES:-"."}
 ENV REMOTE_SOURCES_DIR=${REMOTE_SOURCES_DIR:-"."}
 
 USER 0
-RUN : 'removed yum-config-manager' \
- &&   BUILD_PKGS="make gcc-c++ libffi-devel autoconf automake libtool m4 redhat-rpm-config" \
+RUN   BUILD_PKGS="make gcc-c++ libffi-devel autoconf automake libtool m4 redhat-rpm-config" \
  &&   RUNTIME_PKGS="hostname bc iproute" \
  &&   yum install -y --setopt=tsflags=nodocs $BUILD_PKGS $RUNTIME_PKGS \
  &&   rpm -V $BUILD_PKGS \
@@ -17,15 +15,15 @@ RUN : 'removed yum-config-manager' \
 
 ENV upstream_code=${upstream_code:-"."} \
     HOME=/opt/app-root/src 
-COPY ${upstream_code}/jemalloc/ /tmp/jemalloc/
-RUN pushd /tmp/jemalloc && \
-        EXTRA_CFLAGS="$( rpm --eval '%{optflags}' )" ./autogen.sh && \
-        make install_lib_shared install_bin && \
-        cp COPYING /tmp/COPYING.jemalloc && \
-    popd
+#COPY ${upstream_code}/jemalloc/ /tmp/jemalloc/
+#RUN pushd /tmp/jemalloc && \
+#        EXTRA_CFLAGS="$( rpm --eval '%{optflags}' )" ./autogen.sh && \
+#        make install_lib_shared install_bin && \
+#        cp COPYING /tmp/COPYING.jemalloc && \
+#    popd
 
-COPY ${upstream_code}/source.jemalloc /source.jemalloc
-RUN bash -c '. /source.jemalloc; echo jemalloc $JEMALLOC_VER >> /contents'
+#COPY ${upstream_code}/source.jemalloc /source.jemalloc
+#RUN bash -c '. /source.jemalloc; echo jemalloc $JEMALLOC_VER >> /contents'
 
 COPY ${upstream_code}/vendored_gem_src/ ${HOME}/vendored_gem_src/
 COPY ${upstream_code}/lib ${HOME}/vendored_gem_src
@@ -35,8 +33,7 @@ COPY ${upstream_code}/*.patch ${HOME}/vendored_gem_src/
 
 RUN cd ${HOME}/vendored_gem_src/ && ./install-gems.sh
 
-#@follow_tag(registry.redhat.io/ubi8/ruby-27:latest)
-FROM registry.access.redhat.com/ubi8/ruby-27 AS runtime
+FROM registry-proxy.engineering.redhat.com/rh-osbs/ubi9-ruby-31:1-36 AS runtime
 
 ENV REMOTE_SOURCES=${REMOTE_SOURCES:-"."}
 ENV upstream_code=${upstream_code:-"."}
@@ -66,12 +63,12 @@ RUN RUNTIME_PKGS="hostname bc iproute" \
 
 RUN mkdir -p /etc/fluent/plugin
 
-COPY --from=builder /usr/local/lib/libjemalloc* /usr/local/lib
+# COPY --from=builder /usr/local/lib/libjemalloc* /usr/local/lib
 COPY --from=builder /usr/local/bin/fluentd /usr/local/bin
 COPY --from=builder /usr/local/bin/fluent-cat /usr/local/bin
-COPY --from=builder /usr/local/bin/jemalloc-config /usr/local/bin
-COPY --from=builder /usr/local/bin/jemalloc.sh /usr/local/bin
-COPY --from=builder /usr/local/bin/jeprof /usr/local/bin
+# COPY --from=builder /usr/local/bin/jemalloc-config /usr/local/bin
+# COPY --from=builder /usr/local/bin/jemalloc.sh /usr/local/bin
+# COPY --from=builder /usr/local/bin/jeprof /usr/local/bin
 
 COPY --from=builder /usr/local/share/gems /usr/local/share/gems
 COPY --from=builder /usr/local/lib64/gems/ruby /usr/local/lib64/gems/ruby
