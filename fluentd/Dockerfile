@@ -9,10 +9,10 @@ USER 0
 RUN : 'removed yum-config-manager' \
  &&   BUILD_PKGS="make gcc-c++ libffi-devel autoconf automake libtool m4 redhat-rpm-config libxml2-devel" \
  &&   RUNTIME_PKGS="hostname bc iproute" \
- &&   yum install -y --setopt=tsflags=nodocs $BUILD_PKGS $RUNTIME_PKGS \
+ &&   dnf install -y --setopt=tsflags=nodocs $BUILD_PKGS $RUNTIME_PKGS \
  &&   rpm -V $BUILD_PKGS \
  &&   rpm -V $RUNTIME_PKGS \
- &&   yum clean all
+ &&   dnf clean all
 
 
 ENV upstream_code=${upstream_code:-"."} \
@@ -22,9 +22,7 @@ COPY ${upstream_code}/lib  ${HOME}/lib
 COPY ${upstream_code}/Gemfile* ${HOME}/
 WORKDIR ${HOME}
 
-RUN CONFIGURE_ARGS="--with-cflags='$( rpm --eval %optflags )'" bundle install && \
-    for d in $(ls lib); do pushd lib/$d; gem build --force -V *.gemspec; \ 
-    gem install -N -minimal-deps --local --force --install-dir /usr/share/gems --bindir /usr/bin *.gem; popd; done
+RUN CONFIGURE_ARGS="--with-cflags='$( rpm --eval %optflags )'" bundle install
 
 #@follow_tag(registry.redhat.io/ubi8/ruby-27:latest)
 FROM registry.access.redhat.com/ubi9/ruby-31 AS runtime
@@ -51,19 +49,21 @@ ENV DATA_VERSION=$DATA_VERSION_VALUE \
 
 USER 0
 RUN RUNTIME_PKGS="hostname bc iproute libxml2" \
- &&   yum install -y --setopt=tsflags=nodocs $RUNTIME_PKGS \
+ &&   dnf install -y --setopt=tsflags=nodocs $RUNTIME_PKGS \
  &&   rpm -V $RUNTIME_PKGS \
- &&   yum clean all
+ &&   dnf clean all
 
 RUN mkdir -p /etc/fluent/plugin
 
-COPY --from=builder /usr/bin/fluentd /usr/local/bin
-COPY --from=builder /usr/bin/fluent-cat /usr/local/bin
-
+COPY --from=builder /usr/bin/fluentd /usr/bin/fluentd-orig
+COPY --from=builder /usr/bin/fluent-cat /usr/bin
 COPY --from=builder /usr/share/gems /usr/share/gems
 COPY --from=builder /usr/lib64/gems/ruby /usr/lib64/gems/ruby
+COPY --from=builder ${HOME}/lib ${HOME}/lib
+
 COPY ${upstream_code}/run.sh ${HOME}/
 COPY ${upstream_code}/utils/ /usr/local/bin/
+COPY ${upstream_code}/fluentd /usr/bin/
 
 # Patch gems from upstream which are no longer vendored
 COPY ${upstream_code}/*.patch /usr/share/gems
