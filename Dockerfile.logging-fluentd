@@ -1,0 +1,118 @@
+FROM registry-proxy.engineering.redhat.com/rh-osbs/ubi9-ruby-31:1-125 AS builder
+
+USER 0
+# REMOVE ME?  already installed?
+# RUN : 'removed yum-config-manager' \
+# #  &&   BUILD_PKGS="make gcc-c++ libffi-devel autoconf automake libtool m4 redhat-rpm-config libxml2-devel" \
+#  &&   BUILD_PKGS="make gcc-c++ libffi-devel autoconf automake m4 redhat-rpm-config libxml2-devel" \
+#  &&   dnf install -y --setopt=tsflags=nodocs $BUILD_PKGS $RUNTIME_PKGS \
+#  &&   rpm -V $BUILD_PKGS \
+#  &&   rpm -V $RUNTIME_PKGS \
+#  &&   dnf clean all
+ENV BUNDLE_APP_CONFIG=/tmp \
+    BUNDLE_DEPLOYMENT=true \
+    BUNDLE_FROZEN=false
+
+COPY ./logging-fluentd /opt/app-root/src
+WORKDIR /opt/app-root/src/fluentd
+
+# TODO FIXME FOR HERMETIC BUILDS
+# RUN source $REMOTE_SOURCES_DIR/fluentd/cachito.env \
+#     && cd $REMOTE_SOURCES_DIR/fluentd/deps/rubygems \
+#     && for d in $(ls -d */) ; do \
+#       pushd $d ; \
+#         SSL_CERT_FILE=$REMOTE_SOURCES_DIR/fluentd/rubygems-proxy-ca.pem \
+#         CONFIGURE_ARGS="--with-cflags='$( rpm --eval %optflags )'" \
+#         gem install $(ls *.gem) -f -N -l --ignore-dependencies -n /usr/bin -i /usr/share/gems ; \
+#       popd ; \
+#     done
+RUN env | sort
+RUN \
+    gem install bundler:$(grep BUNDLED -A1 Gemfile.lock | grep -oE '([0-9.])*') && \
+    # bundle config set --local system 'true' && \
+    # bundle config set --local frozen 'false' && \
+    bundle install
+
+# WORKDIR /opt/app-root/src/fluentd/lib
+# RUN for d in $(ls -d */) ; do \
+#       pushd $d ; \
+#         gem build --force -V *.gemspec; \
+#         # SSL_CERT_FILE=$REMOTE_SOURCES_DIR/fluentd/rubygems-proxy-ca.pem \
+#         CONFIGURE_ARGS="--with-cflags='$( rpm --eval %optflags )'" \
+#         gem install -N -minimal-deps --local --force --install-dir /usr/share/gems --bindir /usr/bin *.gem ; \
+#       popd ; \
+#     done
+
+# Patch gems from upstream which are no longer vendored
+WORKDIR /opt/app-root/src/fluentd
+RUN  mv aws-sdk-core.source0001.patch /usr/share/gems/gems/aws-sdk-core-*/ && \
+     pushd /usr/share/gems/gems/aws-sdk-core-*/ && patch -p1 < aws-sdk-core.source0001.patch && \
+     popd &&  \
+     mv fluent-plugin-detect-exceptions.source0001.patch /usr/share/gems/gems/fluent-plugin-detect-exceptions-*/ && \
+     pushd /usr/share/gems/gems/fluent-plugin-detect-exceptions-*/ && patch -p1 < fluent-plugin-detect-exceptions.source0001.patch && \
+     popd &&  \
+     mv fluent-plugin-grafana-loki.source0001.patch /usr/share/gems/gems/fluent-plugin-grafana-loki*/ && \
+     pushd /usr/share/gems/gems/fluent-plugin-grafana-loki*/ && patch -p1 < fluent-plugin-grafana-loki.source0001.patch && \
+     popd && \
+     mv log4366_ruby_lib_net_http.patch /usr/share/ruby/ && \
+     pushd /usr/share/ruby && patch -p1 < log4366_ruby_lib_net_http.patch
+
+
+FROM registry.redhat.io/ubi9-minimal:9.5
+
+ENV HOME=/opt/app-root/src \
+    PATH=/opt/app-root/src/bin:/opt/app-root/bin:$PATH \
+    RUBY_MAJOR_VERSION=3 \
+    RUBY_MINOR_VERSION=1
+
+USER 0
+RUN RUNTIME_PKGS="hostname bc iproute libxml2 ruby" \
+ &&   microdnf -y module enable ruby:${RUBY_MAJOR_VERSION}.${RUBY_MINOR_VERSION} \
+ &&   microdnf install -y --setopt=tsflags=nodocs $RUNTIME_PKGS \
+ &&   rpm -V $RUNTIME_PKGS \
+ &&   microdnf clean all --enablerepo='*'
+
+RUN mkdir -p /etc/fluent/plugin
+
+#fluentd
+COPY --from=builder /usr/bin/fluentd /usr/bin
+COPY --from=builder /usr/bin/fluent-cat /usr/bin
+#ruby
+COPY --from=builder /usr/lib64/gems/ruby /usr/lib64/gems/ruby
+COPY --from=builder /usr/share/gems /usr/share/gems
+COPY --from=builder /usr/share/ruby /usr/share/ruby
+COPY --from=builder /usr/share/rubygems /usr/share/rubygems
+# logging-fluentd
+COPY --from=builder /opt/app-root/src/fluentd/lib ${HOME}/lib
+COPY --from=builder /opt/app-root/src/fluentd/run.sh ${HOME}/
+COPY --from=builder /opt/app-root/src/fluentd/utils/ /usr/local/bin/
+
+
+RUN mkdir -p /etc/fluent/configs.d/user && \
+    chmod 777 /etc/fluent/configs.d/user && \
+    ln -s /etc/fluent/configs.d/user/fluent.conf /etc/fluent/fluent.conf
+
+WORKDIR ${HOME}
+CMD ["sh", "run.sh"]
+
+ARG LOGGING_FLUENTD_COMMIT
+ARG LOGGING_FLUENTD_URL
+LABEL \
+    description="Fluentd container for collection of logs" \
+    distribution-scope="subscription" \
+    license="Apache-2.0" \
+    maintainer="team-logging@redhat.com" \
+    name="openshift-logging/fluentd-rhel9" \
+    release=5.8 \
+    summary="Log collection agent for Red Hat Openshift Logging" \
+    url=${LOGGING_FLUENTD_URL} \
+    vendor="Red Hat, Inc." \
+    version=v1.16.2 \
+    com.redhat.component="logging-fluentd-container" \
+    io.k8s.description="Fluentd container for collecting of container logs" \
+    io.k8s.display-name="Fluentd" \
+    io.openshift.build.commit.id=${LOGGING_FLUENTD_URL} \
+    io.openshift.build.source-location=${LOGGING_FLUENTD_URL} \
+    io.openshift.build.commit.url=${LOGGING_FLUENTD_URL}/commit/${LOGGING_FLUENTD_COMMIT} \
+    io.openshift.maintainer.product="OpenShift Container Platform"  \
+    io.openshift.tags="logging,collection,fluentd"

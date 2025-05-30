@@ -1,0 +1,15 @@
+packages:
+- hostname
+- bc
+- iproute
+- libxml2
+- ruby
+arches:
+- aarch64
+- ppc64le
+- s390x
+- x86_64
+contentOrigin:
+  repofiles: ["./redhat.repo"]
+moduleEnable:
+- ruby:3.1

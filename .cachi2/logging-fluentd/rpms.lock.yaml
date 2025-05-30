@@ -1,0 +1,704 @@
+---
+lockfileVersion: 1
+lockfileVendor: redhat
+arches:
+- arch: aarch64
+  packages:
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/appstream/os/Packages/r/ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-rpms
+    size: 43333
+    checksum: sha256:658dce7a2499304011b5b00b8fc02761661a30365d2fb67c833beaf930c8fd28
+    name: ruby
+    evr: 3.1.7-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/appstream/os/Packages/r/ruby-default-gems-3.1.7-146.module+el9.5.0+23003+a4c328ce.noarch.rpm
+    repoid: rhel-9-for-aarch64-appstream-rpms
+    size: 44418
+    checksum: sha256:188b20ceebadd7a81c93b7eeefa73e3edf140dee9e4e9d631828799674f84ff2
+    name: ruby-default-gems
+    evr: 3.1.7-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/appstream/os/Packages/r/ruby-libs-3.1.7-146.module+el9.5.0+23003+a4c328ce.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-rpms
+    size: 3392318
+    checksum: sha256:360f126b21f935c3a4e493c82a6598a9e32747ae6943fe27c00627413eacab48
+    name: ruby-libs
+    evr: 3.1.7-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/appstream/os/Packages/r/rubygem-bigdecimal-3.1.1-146.module+el9.5.0+23003+a4c328ce.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-rpms
+    size: 71663
+    checksum: sha256:c588a8b442c74751b98c8bc623e83e161cca1cea26f4a4165493eaf930129935
+    name: rubygem-bigdecimal
+    evr: 3.1.1-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/appstream/os/Packages/r/rubygem-bundler-2.3.27-146.module+el9.5.0+23003+a4c328ce.noarch.rpm
+    repoid: rhel-9-for-aarch64-appstream-rpms
+    size: 478657
+    checksum: sha256:63c9c8d0c7dd5f70ceb65e0a25880ec82bf8e50ca9cff73aa6b25ad9be8e40c3
+    name: rubygem-bundler
+    evr: 2.3.27-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/appstream/os/Packages/r/rubygem-io-console-0.5.11-146.module+el9.5.0+23003+a4c328ce.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-rpms
+    size: 27230
+    checksum: sha256:e11ccd8c913cfe1f10198ff64294ec71a3dc03fc275687b94abb2acc54a95ce2
+    name: rubygem-io-console
+    evr: 0.5.11-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/appstream/os/Packages/r/rubygem-json-2.6.1-146.module+el9.5.0+23003+a4c328ce.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-rpms
+    size: 59986
+    checksum: sha256:5ca7aedc5bf69ae13b758ecdc457d9b169d1fff8c58920e3c411346092c299b3
+    name: rubygem-json
+    evr: 2.6.1-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/appstream/os/Packages/r/rubygem-psych-4.0.4-146.module+el9.5.0+23003+a4c328ce.aarch64.rpm
+    repoid: rhel-9-for-aarch64-appstream-rpms
+    size: 62536
+    checksum: sha256:087adb51019c222efae5bf5b79a32e30213adee72b70452f9301ec4c5f9e4fc6
+    name: rubygem-psych
+    evr: 4.0.4-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/appstream/os/Packages/r/rubygem-rdoc-6.4.1.1-146.module+el9.5.0+23003+a4c328ce.noarch.rpm
+    repoid: rhel-9-for-aarch64-appstream-rpms
+    size: 513733
+    checksum: sha256:fc90c80df93b2ad72628d1adce07cbe6e4ea654b6c8769beed29acde0cf1ad81
+    name: rubygem-rdoc
+    evr: 6.4.1.1-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/appstream/os/Packages/r/rubygems-3.3.27-146.module+el9.5.0+23003+a4c328ce.noarch.rpm
+    repoid: rhel-9-for-aarch64-appstream-rpms
+    size: 310575
+    checksum: sha256:246a86c0040165c1b247691d6703e55ee2dc15dcc2d8624a1ec4ad4b5f00f6fc
+    name: rubygems
+    evr: 3.3.27-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/baseos/os/Packages/b/bc-1.07.1-14.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-baseos-rpms
+    size: 125966
+    checksum: sha256:c88872b3ded640ac750a7e232e8745383b912376c24e7c9e18514f16eeefcd71
+    name: bc
+    evr: 1.07.1-14.el9
+    sourcerpm: bc-1.07.1-14.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/baseos/os/Packages/e/elfutils-libelf-0.192-5.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-baseos-rpms
+    size: 211706
+    checksum: sha256:6b3ef2b8e3dfe144aa7f46438f0729ff7fa0ef6ec4ad687593838426cc0406da
+    name: elfutils-libelf
+    evr: 0.192-5.el9
+    sourcerpm: elfutils-0.192-5.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/baseos/os/Packages/h/hostname-3.23-6.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-baseos-rpms
+    size: 33374
+    checksum: sha256:db9eb59805f25764549f8105825c987b7bd359a86624d4633dd5d4283959ed97
+    name: hostname
+    evr: 3.23-6.el9
+    sourcerpm: hostname-3.23-6.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/baseos/os/Packages/i/iproute-6.11.0-1.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-baseos-rpms
+    size: 860548
+    checksum: sha256:dc56cba4ea8324e48f13e39d4388d06419f742c5fa3c581855254cf1e6648690
+    name: iproute
+    evr: 6.11.0-1.el9
+    sourcerpm: iproute-6.11.0-1.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/baseos/os/Packages/l/libbpf-1.5.0-1.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-baseos-rpms
+    size: 191251
+    checksum: sha256:05fe053e84ffca806d3f6c4dedebdfb61b8362bdbc0e3508875dec6c2db71d23
+    name: libbpf
+    evr: 2:1.5.0-1.el9
+    sourcerpm: libbpf-1.5.0-1.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/baseos/os/Packages/l/libmnl-1.0.4-16.el9_4.aarch64.rpm
+    repoid: rhel-9-for-aarch64-baseos-rpms
+    size: 30479
+    checksum: sha256:b07344f5116a1913e746042748b05f978d284833282d9633e29f3d595ab596e9
+    name: libmnl
+    evr: 1.0.4-16.el9_4
+    sourcerpm: libmnl-1.0.4-16.el9_4.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/baseos/os/Packages/p/psmisc-23.4-3.el9.aarch64.rpm
+    repoid: rhel-9-for-aarch64-baseos-rpms
+    size: 252522
+    checksum: sha256:609ffc1ea49d733bf2fabf521851acf20e62cd873c3679f735bc7486b2434359
+    name: psmisc
+    evr: 23.4-3.el9
+    sourcerpm: psmisc-23.4-3.el9.src.rpm
+  source:
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/appstream/source/SRPMS/Packages/r/ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+    repoid: rhel-9-for-aarch64-appstream-source-rpms
+    size: 15294593
+    checksum: sha256:4f674a099940a5689799ae8dc0bdb313f05f3df6ba5f1ac032733eb34f7568ce
+    name: ruby
+    evr: 3.1.7-146.module+el9.5.0+23003+a4c328ce
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/baseos/source/SRPMS/Packages/b/bc-1.07.1-14.el9.src.rpm
+    repoid: rhel-9-for-aarch64-baseos-source-rpms
+    size: 435649
+    checksum: sha256:2349c6df81f4845eed889a772f6f982952dfa278eeb90911b3d4e77c2a1f7351
+    name: bc
+    evr: 1.07.1-14.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/baseos/source/SRPMS/Packages/e/elfutils-0.192-5.el9.src.rpm
+    repoid: rhel-9-for-aarch64-baseos-source-rpms
+    size: 11943728
+    checksum: sha256:b5a00f4c49b8980167b250ed7f9e18b90162087cac06276a4fb4ce578a1e3d5a
+    name: elfutils
+    evr: 0.192-5.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/baseos/source/SRPMS/Packages/h/hostname-3.23-6.el9.src.rpm
+    repoid: rhel-9-for-aarch64-baseos-source-rpms
+    size: 35668
+    checksum: sha256:8128f7855d3b1cf3010f053803642791e63cb919b78684c7ce806b4f0d58fe54
+    name: hostname
+    evr: 3.23-6.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/baseos/source/SRPMS/Packages/i/iproute-6.11.0-1.el9.src.rpm
+    repoid: rhel-9-for-aarch64-baseos-source-rpms
+    size: 937429
+    checksum: sha256:11bfd8c1de1c26b8510340b467a933a800134d2e6e6f58a215d729a0727eee58
+    name: iproute
+    evr: 6.11.0-1.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/baseos/source/SRPMS/Packages/l/libbpf-1.5.0-1.el9.src.rpm
+    repoid: rhel-9-for-aarch64-baseos-source-rpms
+    size: 143177750
+    checksum: sha256:ee50dc55ea737d1d7969b07da6b02fc093fbbc533498649570b08b3fa9caaa90
+    name: libbpf
+    evr: 2:1.5.0-1.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/baseos/source/SRPMS/Packages/l/libmnl-1.0.4-16.el9_4.src.rpm
+    repoid: rhel-9-for-aarch64-baseos-source-rpms
+    size: 313835
+    checksum: sha256:ebfb5c801e7a3a2b83b4c4612ea923b9dd155428e738ff52b03e8966b78d2c08
+    name: libmnl
+    evr: 1.0.4-16.el9_4
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/baseos/source/SRPMS/Packages/p/psmisc-23.4-3.el9.src.rpm
+    repoid: rhel-9-for-aarch64-baseos-source-rpms
+    size: 386002
+    checksum: sha256:9e65fd323b6c88f71e05576b931a10ba4bdce9314114ba88e436482efa77d6bd
+    name: psmisc
+    evr: 23.4-3.el9
+  module_metadata:
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/aarch64/appstream/os/repodata/f351fdb3118ffbd5aacfa9249350fcc823d8535e02b3b1f33bc0586c56dbf9d9-modules.yaml.gz
+    repoid: rhel-9-for-aarch64-appstream-rpms
+    size: 31164
+    checksum: sha256:f351fdb3118ffbd5aacfa9249350fcc823d8535e02b3b1f33bc0586c56dbf9d9
+- arch: ppc64le
+  packages:
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/appstream/os/Packages/r/ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.ppc64le.rpm
+    repoid: rhel-9-for-ppc64le-appstream-rpms
+    size: 43243
+    checksum: sha256:50c35009f03d6163636c9cbdbc5e785adf7c3ee3c30b62025ff4abffc7271611
+    name: ruby
+    evr: 3.1.7-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/appstream/os/Packages/r/ruby-default-gems-3.1.7-146.module+el9.5.0+23003+a4c328ce.noarch.rpm
+    repoid: rhel-9-for-ppc64le-appstream-rpms
+    size: 44418
+    checksum: sha256:188b20ceebadd7a81c93b7eeefa73e3edf140dee9e4e9d631828799674f84ff2
+    name: ruby-default-gems
+    evr: 3.1.7-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/appstream/os/Packages/r/ruby-libs-3.1.7-146.module+el9.5.0+23003+a4c328ce.ppc64le.rpm
+    repoid: rhel-9-for-ppc64le-appstream-rpms
+    size: 3602326
+    checksum: sha256:fe8c2c4fdd734f3629748921dbbe1ffbde69c9fd4339e38b5609df12bdd5fc01
+    name: ruby-libs
+    evr: 3.1.7-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/appstream/os/Packages/r/rubygem-bigdecimal-3.1.1-146.module+el9.5.0+23003+a4c328ce.ppc64le.rpm
+    repoid: rhel-9-for-ppc64le-appstream-rpms
+    size: 78854
+    checksum: sha256:ef47f2796fa5869b811bfc7fd12ab300e1a9808f48f0827969c7f125dfcb73fa
+    name: rubygem-bigdecimal
+    evr: 3.1.1-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/appstream/os/Packages/r/rubygem-bundler-2.3.27-146.module+el9.5.0+23003+a4c328ce.noarch.rpm
+    repoid: rhel-9-for-ppc64le-appstream-rpms
+    size: 478657
+    checksum: sha256:63c9c8d0c7dd5f70ceb65e0a25880ec82bf8e50ca9cff73aa6b25ad9be8e40c3
+    name: rubygem-bundler
+    evr: 2.3.27-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/appstream/os/Packages/r/rubygem-io-console-0.5.11-146.module+el9.5.0+23003+a4c328ce.ppc64le.rpm
+    repoid: rhel-9-for-ppc64le-appstream-rpms
+    size: 28207
+    checksum: sha256:58085794b83bcc6e7d58f9c3e8903855cb62f230f9b69e44ed8542c5c01a89c8
+    name: rubygem-io-console
+    evr: 0.5.11-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/appstream/os/Packages/r/rubygem-json-2.6.1-146.module+el9.5.0+23003+a4c328ce.ppc64le.rpm
+    repoid: rhel-9-for-ppc64le-appstream-rpms
+    size: 64215
+    checksum: sha256:b3cc32a1aacfed19496a57627dc62d44081b6090085417838d40739d1aafef0c
+    name: rubygem-json
+    evr: 2.6.1-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/appstream/os/Packages/r/rubygem-psych-4.0.4-146.module+el9.5.0+23003+a4c328ce.ppc64le.rpm
+    repoid: rhel-9-for-ppc64le-appstream-rpms
+    size: 63360
+    checksum: sha256:fb1d5fb726db06da50c7ef95520894075d7266e3d49a72ba1c0fdff117b92596
+    name: rubygem-psych
+    evr: 4.0.4-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/appstream/os/Packages/r/rubygem-rdoc-6.4.1.1-146.module+el9.5.0+23003+a4c328ce.noarch.rpm
+    repoid: rhel-9-for-ppc64le-appstream-rpms
+    size: 513733
+    checksum: sha256:fc90c80df93b2ad72628d1adce07cbe6e4ea654b6c8769beed29acde0cf1ad81
+    name: rubygem-rdoc
+    evr: 6.4.1.1-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/appstream/os/Packages/r/rubygems-3.3.27-146.module+el9.5.0+23003+a4c328ce.noarch.rpm
+    repoid: rhel-9-for-ppc64le-appstream-rpms
+    size: 310575
+    checksum: sha256:246a86c0040165c1b247691d6703e55ee2dc15dcc2d8624a1ec4ad4b5f00f6fc
+    name: rubygems
+    evr: 3.3.27-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/baseos/os/Packages/b/bc-1.07.1-14.el9.ppc64le.rpm
+    repoid: rhel-9-for-ppc64le-baseos-rpms
+    size: 132893
+    checksum: sha256:2f2d050bb10a3dbfe20dcbd42bfa16344d9356c0ec004b517ff77f389247e304
+    name: bc
+    evr: 1.07.1-14.el9
+    sourcerpm: bc-1.07.1-14.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/baseos/os/Packages/e/elfutils-libelf-0.192-5.el9.ppc64le.rpm
+    repoid: rhel-9-for-ppc64le-baseos-rpms
+    size: 219509
+    checksum: sha256:84022222ff03a84f18a7fc7e4f12a228bb050ee0fb332e40b2e1d3b723755164
+    name: elfutils-libelf
+    evr: 0.192-5.el9
+    sourcerpm: elfutils-0.192-5.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/baseos/os/Packages/h/hostname-3.23-6.el9.ppc64le.rpm
+    repoid: rhel-9-for-ppc64le-baseos-rpms
+    size: 33820
+    checksum: sha256:175181bedfbbac0a7a0198495c284642607126cadbcb1116a561548448020a55
+    name: hostname
+    evr: 3.23-6.el9
+    sourcerpm: hostname-3.23-6.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/baseos/os/Packages/i/iproute-6.11.0-1.el9.ppc64le.rpm
+    repoid: rhel-9-for-ppc64le-baseos-rpms
+    size: 963964
+    checksum: sha256:656a818c9aa56792f4de982cf4e7bfa85acf35c35a62cfbad85b9e20d601cf0c
+    name: iproute
+    evr: 6.11.0-1.el9
+    sourcerpm: iproute-6.11.0-1.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/baseos/os/Packages/l/libbpf-1.5.0-1.el9.ppc64le.rpm
+    repoid: rhel-9-for-ppc64le-baseos-rpms
+    size: 225663
+    checksum: sha256:7480adb09dcbb0b1af8b47ac33f1e582e64ac7a9b25fe67b5f27c7e457c3afbe
+    name: libbpf
+    evr: 2:1.5.0-1.el9
+    sourcerpm: libbpf-1.5.0-1.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/baseos/os/Packages/l/libmnl-1.0.4-16.el9_4.ppc64le.rpm
+    repoid: rhel-9-for-ppc64le-baseos-rpms
+    size: 31302
+    checksum: sha256:3fd5f41ebe4c9ca119109ff8263189a63bddf9df1c509de44986e69d9b7be2b3
+    name: libmnl
+    evr: 1.0.4-16.el9_4
+    sourcerpm: libmnl-1.0.4-16.el9_4.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/baseos/os/Packages/p/psmisc-23.4-3.el9.ppc64le.rpm
+    repoid: rhel-9-for-ppc64le-baseos-rpms
+    size: 257518
+    checksum: sha256:b392d51437d0f8197d18b207d037da5af8d7d3bcdc218482d737c70a46416e81
+    name: psmisc
+    evr: 23.4-3.el9
+    sourcerpm: psmisc-23.4-3.el9.src.rpm
+  source:
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/appstream/source/SRPMS/Packages/r/ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+    repoid: rhel-9-for-ppc64le-appstream-source-rpms
+    size: 15294593
+    checksum: sha256:4f674a099940a5689799ae8dc0bdb313f05f3df6ba5f1ac032733eb34f7568ce
+    name: ruby
+    evr: 3.1.7-146.module+el9.5.0+23003+a4c328ce
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/baseos/source/SRPMS/Packages/b/bc-1.07.1-14.el9.src.rpm
+    repoid: rhel-9-for-ppc64le-baseos-source-rpms
+    size: 435649
+    checksum: sha256:2349c6df81f4845eed889a772f6f982952dfa278eeb90911b3d4e77c2a1f7351
+    name: bc
+    evr: 1.07.1-14.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/baseos/source/SRPMS/Packages/e/elfutils-0.192-5.el9.src.rpm
+    repoid: rhel-9-for-ppc64le-baseos-source-rpms
+    size: 11943728
+    checksum: sha256:b5a00f4c49b8980167b250ed7f9e18b90162087cac06276a4fb4ce578a1e3d5a
+    name: elfutils
+    evr: 0.192-5.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/baseos/source/SRPMS/Packages/h/hostname-3.23-6.el9.src.rpm
+    repoid: rhel-9-for-ppc64le-baseos-source-rpms
+    size: 35668
+    checksum: sha256:8128f7855d3b1cf3010f053803642791e63cb919b78684c7ce806b4f0d58fe54
+    name: hostname
+    evr: 3.23-6.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/baseos/source/SRPMS/Packages/i/iproute-6.11.0-1.el9.src.rpm
+    repoid: rhel-9-for-ppc64le-baseos-source-rpms
+    size: 937429
+    checksum: sha256:11bfd8c1de1c26b8510340b467a933a800134d2e6e6f58a215d729a0727eee58
+    name: iproute
+    evr: 6.11.0-1.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/baseos/source/SRPMS/Packages/l/libbpf-1.5.0-1.el9.src.rpm
+    repoid: rhel-9-for-ppc64le-baseos-source-rpms
+    size: 143177750
+    checksum: sha256:ee50dc55ea737d1d7969b07da6b02fc093fbbc533498649570b08b3fa9caaa90
+    name: libbpf
+    evr: 2:1.5.0-1.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/baseos/source/SRPMS/Packages/l/libmnl-1.0.4-16.el9_4.src.rpm
+    repoid: rhel-9-for-ppc64le-baseos-source-rpms
+    size: 313835
+    checksum: sha256:ebfb5c801e7a3a2b83b4c4612ea923b9dd155428e738ff52b03e8966b78d2c08
+    name: libmnl
+    evr: 1.0.4-16.el9_4
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/baseos/source/SRPMS/Packages/p/psmisc-23.4-3.el9.src.rpm
+    repoid: rhel-9-for-ppc64le-baseos-source-rpms
+    size: 386002
+    checksum: sha256:9e65fd323b6c88f71e05576b931a10ba4bdce9314114ba88e436482efa77d6bd
+    name: psmisc
+    evr: 23.4-3.el9
+  module_metadata:
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/ppc64le/appstream/os/repodata/fa536cd92aaea0fcf6db1829dd9304b412bb89d1a7c546cd81503f11dbc5a453-modules.yaml.gz
+    repoid: rhel-9-for-ppc64le-appstream-rpms
+    size: 30324
+    checksum: sha256:fa536cd92aaea0fcf6db1829dd9304b412bb89d1a7c546cd81503f11dbc5a453
+- arch: s390x
+  packages:
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/appstream/os/Packages/r/ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.s390x.rpm
+    repoid: rhel-9-for-s390x-appstream-rpms
+    size: 43371
+    checksum: sha256:4c1f18fae563384e8e419e64bdc4d976434f28be5bd68523441ece51b93bb174
+    name: ruby
+    evr: 3.1.7-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/appstream/os/Packages/r/ruby-default-gems-3.1.7-146.module+el9.5.0+23003+a4c328ce.noarch.rpm
+    repoid: rhel-9-for-s390x-appstream-rpms
+    size: 44418
+    checksum: sha256:188b20ceebadd7a81c93b7eeefa73e3edf140dee9e4e9d631828799674f84ff2
+    name: ruby-default-gems
+    evr: 3.1.7-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/appstream/os/Packages/r/ruby-libs-3.1.7-146.module+el9.5.0+23003+a4c328ce.s390x.rpm
+    repoid: rhel-9-for-s390x-appstream-rpms
+    size: 3330615
+    checksum: sha256:a1cf0876a537c0ba3de85fd6c183542d59e8c78417b26e88f99224d77a3da403
+    name: ruby-libs
+    evr: 3.1.7-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/appstream/os/Packages/r/rubygem-bigdecimal-3.1.1-146.module+el9.5.0+23003+a4c328ce.s390x.rpm
+    repoid: rhel-9-for-s390x-appstream-rpms
+    size: 73098
+    checksum: sha256:3febe640e3b10a45a6f485ab2a719de47149af3c49259e3905030e5dfa24ef05
+    name: rubygem-bigdecimal
+    evr: 3.1.1-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/appstream/os/Packages/r/rubygem-bundler-2.3.27-146.module+el9.5.0+23003+a4c328ce.noarch.rpm
+    repoid: rhel-9-for-s390x-appstream-rpms
+    size: 478657
+    checksum: sha256:63c9c8d0c7dd5f70ceb65e0a25880ec82bf8e50ca9cff73aa6b25ad9be8e40c3
+    name: rubygem-bundler
+    evr: 2.3.27-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/appstream/os/Packages/r/rubygem-io-console-0.5.11-146.module+el9.5.0+23003+a4c328ce.s390x.rpm
+    repoid: rhel-9-for-s390x-appstream-rpms
+    size: 26600
+    checksum: sha256:35042fbc764e20e322ad11d0d70d5df45348b5d19999a68e0570ae088c4218c3
+    name: rubygem-io-console
+    evr: 0.5.11-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/appstream/os/Packages/r/rubygem-json-2.6.1-146.module+el9.5.0+23003+a4c328ce.s390x.rpm
+    repoid: rhel-9-for-s390x-appstream-rpms
+    size: 59933
+    checksum: sha256:75b2f5f7d34df695966ad7edb84b3be52caf7cefe178cf1b884acb9334fdfe98
+    name: rubygem-json
+    evr: 2.6.1-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/appstream/os/Packages/r/rubygem-psych-4.0.4-146.module+el9.5.0+23003+a4c328ce.s390x.rpm
+    repoid: rhel-9-for-s390x-appstream-rpms
+    size: 62561
+    checksum: sha256:d8f0287932dd54e77d2bc6bd480dcf53ade64348950a7e6c45518cc044bd67fa
+    name: rubygem-psych
+    evr: 4.0.4-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/appstream/os/Packages/r/rubygem-rdoc-6.4.1.1-146.module+el9.5.0+23003+a4c328ce.noarch.rpm
+    repoid: rhel-9-for-s390x-appstream-rpms
+    size: 513733
+    checksum: sha256:fc90c80df93b2ad72628d1adce07cbe6e4ea654b6c8769beed29acde0cf1ad81
+    name: rubygem-rdoc
+    evr: 6.4.1.1-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/appstream/os/Packages/r/rubygems-3.3.27-146.module+el9.5.0+23003+a4c328ce.noarch.rpm
+    repoid: rhel-9-for-s390x-appstream-rpms
+    size: 310575
+    checksum: sha256:246a86c0040165c1b247691d6703e55ee2dc15dcc2d8624a1ec4ad4b5f00f6fc
+    name: rubygems
+    evr: 3.3.27-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/baseos/os/Packages/b/bc-1.07.1-14.el9.s390x.rpm
+    repoid: rhel-9-for-s390x-baseos-rpms
+    size: 126918
+    checksum: sha256:62ffc09bd80d7e407cac9e4beff0c287b27d1610e99e5f3d1b667740aed026e8
+    name: bc
+    evr: 1.07.1-14.el9
+    sourcerpm: bc-1.07.1-14.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/baseos/os/Packages/e/elfutils-libelf-0.192-5.el9.s390x.rpm
+    repoid: rhel-9-for-s390x-baseos-rpms
+    size: 212659
+    checksum: sha256:5f2cc1d044c7a687a4d991d45b530b436ffa90ccdbb873b4e3d8e529c1b740cb
+    name: elfutils-libelf
+    evr: 0.192-5.el9
+    sourcerpm: elfutils-0.192-5.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/baseos/os/Packages/h/hostname-3.23-6.el9.s390x.rpm
+    repoid: rhel-9-for-s390x-baseos-rpms
+    size: 33391
+    checksum: sha256:5ecee069e0a687085b051bab786c2866264dace46fafa60ab10f23b3325c800d
+    name: hostname
+    evr: 3.23-6.el9
+    sourcerpm: hostname-3.23-6.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/baseos/os/Packages/i/iproute-6.11.0-1.el9.s390x.rpm
+    repoid: rhel-9-for-s390x-baseos-rpms
+    size: 826526
+    checksum: sha256:ff627f1f5f86ade515d9c06efbcfef0bce1ca00e3099d35f92947464860a2a25
+    name: iproute
+    evr: 6.11.0-1.el9
+    sourcerpm: iproute-6.11.0-1.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/baseos/os/Packages/l/libbpf-1.5.0-1.el9.s390x.rpm
+    repoid: rhel-9-for-s390x-baseos-rpms
+    size: 186212
+    checksum: sha256:bdfb8287bf29657d20aebb8253a2f8f526c397c1783f62e95188c61a15ea8a94
+    name: libbpf
+    evr: 2:1.5.0-1.el9
+    sourcerpm: libbpf-1.5.0-1.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/baseos/os/Packages/l/libmnl-1.0.4-16.el9_4.s390x.rpm
+    repoid: rhel-9-for-s390x-baseos-rpms
+    size: 30748
+    checksum: sha256:4575aae4ddb520f50b1186fe89f88edc27464bae4f8a00467c6bd3c4a8175434
+    name: libmnl
+    evr: 1.0.4-16.el9_4
+    sourcerpm: libmnl-1.0.4-16.el9_4.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/baseos/os/Packages/p/psmisc-23.4-3.el9.s390x.rpm
+    repoid: rhel-9-for-s390x-baseos-rpms
+    size: 245836
+    checksum: sha256:bc7cb69afea480e1ee3b44de3f3a95b919cdcb8b19e6d95b7ba74906eef21fee
+    name: psmisc
+    evr: 23.4-3.el9
+    sourcerpm: psmisc-23.4-3.el9.src.rpm
+  source:
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/appstream/source/SRPMS/Packages/r/ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+    repoid: rhel-9-for-s390x-appstream-source-rpms
+    size: 15294593
+    checksum: sha256:4f674a099940a5689799ae8dc0bdb313f05f3df6ba5f1ac032733eb34f7568ce
+    name: ruby
+    evr: 3.1.7-146.module+el9.5.0+23003+a4c328ce
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/baseos/source/SRPMS/Packages/b/bc-1.07.1-14.el9.src.rpm
+    repoid: rhel-9-for-s390x-baseos-source-rpms
+    size: 435649
+    checksum: sha256:2349c6df81f4845eed889a772f6f982952dfa278eeb90911b3d4e77c2a1f7351
+    name: bc
+    evr: 1.07.1-14.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/baseos/source/SRPMS/Packages/e/elfutils-0.192-5.el9.src.rpm
+    repoid: rhel-9-for-s390x-baseos-source-rpms
+    size: 11943728
+    checksum: sha256:b5a00f4c49b8980167b250ed7f9e18b90162087cac06276a4fb4ce578a1e3d5a
+    name: elfutils
+    evr: 0.192-5.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/baseos/source/SRPMS/Packages/h/hostname-3.23-6.el9.src.rpm
+    repoid: rhel-9-for-s390x-baseos-source-rpms
+    size: 35668
+    checksum: sha256:8128f7855d3b1cf3010f053803642791e63cb919b78684c7ce806b4f0d58fe54
+    name: hostname
+    evr: 3.23-6.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/baseos/source/SRPMS/Packages/i/iproute-6.11.0-1.el9.src.rpm
+    repoid: rhel-9-for-s390x-baseos-source-rpms
+    size: 937429
+    checksum: sha256:11bfd8c1de1c26b8510340b467a933a800134d2e6e6f58a215d729a0727eee58
+    name: iproute
+    evr: 6.11.0-1.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/baseos/source/SRPMS/Packages/l/libbpf-1.5.0-1.el9.src.rpm
+    repoid: rhel-9-for-s390x-baseos-source-rpms
+    size: 143177750
+    checksum: sha256:ee50dc55ea737d1d7969b07da6b02fc093fbbc533498649570b08b3fa9caaa90
+    name: libbpf
+    evr: 2:1.5.0-1.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/baseos/source/SRPMS/Packages/l/libmnl-1.0.4-16.el9_4.src.rpm
+    repoid: rhel-9-for-s390x-baseos-source-rpms
+    size: 313835
+    checksum: sha256:ebfb5c801e7a3a2b83b4c4612ea923b9dd155428e738ff52b03e8966b78d2c08
+    name: libmnl
+    evr: 1.0.4-16.el9_4
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/baseos/source/SRPMS/Packages/p/psmisc-23.4-3.el9.src.rpm
+    repoid: rhel-9-for-s390x-baseos-source-rpms
+    size: 386002
+    checksum: sha256:9e65fd323b6c88f71e05576b931a10ba4bdce9314114ba88e436482efa77d6bd
+    name: psmisc
+    evr: 23.4-3.el9
+  module_metadata:
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/s390x/appstream/os/repodata/b963bbec5a36f46e25c3d18d9e86f254701794954ddb8e2893851f4128910e1c-modules.yaml.gz
+    repoid: rhel-9-for-s390x-appstream-rpms
+    size: 30620
+    checksum: sha256:b963bbec5a36f46e25c3d18d9e86f254701794954ddb8e2893851f4128910e1c
+- arch: x86_64
+  packages:
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/r/ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-rpms
+    size: 43592
+    checksum: sha256:0e459e5aed1582d09163c170273e4ca29bc206b1f4d125335f134a14383e2724
+    name: ruby
+    evr: 3.1.7-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/r/ruby-default-gems-3.1.7-146.module+el9.5.0+23003+a4c328ce.noarch.rpm
+    repoid: rhel-9-for-x86_64-appstream-rpms
+    size: 44418
+    checksum: sha256:188b20ceebadd7a81c93b7eeefa73e3edf140dee9e4e9d631828799674f84ff2
+    name: ruby-default-gems
+    evr: 3.1.7-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/r/ruby-libs-3.1.7-146.module+el9.5.0+23003+a4c328ce.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-rpms
+    size: 3505581
+    checksum: sha256:30f1274ffeda1d71895b6aca5d3bff87380cee11a2b4213a457f579f485680b0
+    name: ruby-libs
+    evr: 3.1.7-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/r/rubygem-bigdecimal-3.1.1-146.module+el9.5.0+23003+a4c328ce.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-rpms
+    size: 73307
+    checksum: sha256:256cf0233eb9c46bc658d394069a00f71bda2756fba431ee9088d66c38d26515
+    name: rubygem-bigdecimal
+    evr: 3.1.1-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/r/rubygem-bundler-2.3.27-146.module+el9.5.0+23003+a4c328ce.noarch.rpm
+    repoid: rhel-9-for-x86_64-appstream-rpms
+    size: 478657
+    checksum: sha256:63c9c8d0c7dd5f70ceb65e0a25880ec82bf8e50ca9cff73aa6b25ad9be8e40c3
+    name: rubygem-bundler
+    evr: 2.3.27-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/r/rubygem-io-console-0.5.11-146.module+el9.5.0+23003+a4c328ce.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-rpms
+    size: 27491
+    checksum: sha256:4aabb431d252fd027f7ee2c38a8a580584125bccb6adb535690929c130fe23b1
+    name: rubygem-io-console
+    evr: 0.5.11-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/r/rubygem-json-2.6.1-146.module+el9.5.0+23003+a4c328ce.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-rpms
+    size: 61839
+    checksum: sha256:2afcbb62855e1ae63b4b3cc2ec0bb89105a14afbf554f21605ead79712ff2765
+    name: rubygem-json
+    evr: 2.6.1-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/r/rubygem-psych-4.0.4-146.module+el9.5.0+23003+a4c328ce.x86_64.rpm
+    repoid: rhel-9-for-x86_64-appstream-rpms
+    size: 62912
+    checksum: sha256:c43e35151c3aa33067f79cadfec320f26bb865dc33455915a74a080145431e87
+    name: rubygem-psych
+    evr: 4.0.4-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/r/rubygem-rdoc-6.4.1.1-146.module+el9.5.0+23003+a4c328ce.noarch.rpm
+    repoid: rhel-9-for-x86_64-appstream-rpms
+    size: 513733
+    checksum: sha256:fc90c80df93b2ad72628d1adce07cbe6e4ea654b6c8769beed29acde0cf1ad81
+    name: rubygem-rdoc
+    evr: 6.4.1.1-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/Packages/r/rubygems-3.3.27-146.module+el9.5.0+23003+a4c328ce.noarch.rpm
+    repoid: rhel-9-for-x86_64-appstream-rpms
+    size: 310575
+    checksum: sha256:246a86c0040165c1b247691d6703e55ee2dc15dcc2d8624a1ec4ad4b5f00f6fc
+    name: rubygems
+    evr: 3.3.27-146.module+el9.5.0+23003+a4c328ce
+    sourcerpm: ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/b/bc-1.07.1-14.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-baseos-rpms
+    size: 127511
+    checksum: sha256:9b6d28a6563d4c9f721f031ab0cf146fed097d8c4d186b57eaa8dd9ceb4d0685
+    name: bc
+    evr: 1.07.1-14.el9
+    sourcerpm: bc-1.07.1-14.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/e/elfutils-libelf-0.192-5.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-baseos-rpms
+    size: 212505
+    checksum: sha256:20ef8ae38ec86e43d0adc5b8473bb8feeb880467dfda93f37f0d362ba06a79bc
+    name: elfutils-libelf
+    evr: 0.192-5.el9
+    sourcerpm: elfutils-0.192-5.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/h/hostname-3.23-6.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-baseos-rpms
+    size: 33683
+    checksum: sha256:d4c2e4f444b86ef3a26eda5fe39fc30793d31f44d34d885a43b914b83c4dac58
+    name: hostname
+    evr: 3.23-6.el9
+    sourcerpm: hostname-3.23-6.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/i/iproute-6.11.0-1.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-baseos-rpms
+    size: 855648
+    checksum: sha256:8fdbd5d311c7002f6553c31406f642ed136e94008b49376d581286646648d11d
+    name: iproute
+    evr: 6.11.0-1.el9
+    sourcerpm: iproute-6.11.0-1.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/l/libbpf-1.5.0-1.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-baseos-rpms
+    size: 191098
+    checksum: sha256:488a913a5f10debb4fb27756f59da75c61c6fefac403ea62d50b8071625d5cf3
+    name: libbpf
+    evr: 2:1.5.0-1.el9
+    sourcerpm: libbpf-1.5.0-1.el9.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/l/libmnl-1.0.4-16.el9_4.x86_64.rpm
+    repoid: rhel-9-for-x86_64-baseos-rpms
+    size: 30949
+    checksum: sha256:badfd4eb5b7cd3622da84168674002ec718ef810ce615a1113d3e19e265b777e
+    name: libmnl
+    evr: 1.0.4-16.el9_4
+    sourcerpm: libmnl-1.0.4-16.el9_4.src.rpm
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/os/Packages/p/psmisc-23.4-3.el9.x86_64.rpm
+    repoid: rhel-9-for-x86_64-baseos-rpms
+    size: 253357
+    checksum: sha256:30ad5408417c7f06fb945dc321bef3ce31f813f25389707dd1efa7c1d337b806
+    name: psmisc
+    evr: 23.4-3.el9
+    sourcerpm: psmisc-23.4-3.el9.src.rpm
+  source:
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/source/SRPMS/Packages/r/ruby-3.1.7-146.module+el9.5.0+23003+a4c328ce.src.rpm
+    repoid: rhel-9-for-x86_64-appstream-source-rpms
+    size: 15294593
+    checksum: sha256:4f674a099940a5689799ae8dc0bdb313f05f3df6ba5f1ac032733eb34f7568ce
+    name: ruby
+    evr: 3.1.7-146.module+el9.5.0+23003+a4c328ce
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/b/bc-1.07.1-14.el9.src.rpm
+    repoid: rhel-9-for-x86_64-baseos-source-rpms
+    size: 435649
+    checksum: sha256:2349c6df81f4845eed889a772f6f982952dfa278eeb90911b3d4e77c2a1f7351
+    name: bc
+    evr: 1.07.1-14.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/e/elfutils-0.192-5.el9.src.rpm
+    repoid: rhel-9-for-x86_64-baseos-source-rpms
+    size: 11943728
+    checksum: sha256:b5a00f4c49b8980167b250ed7f9e18b90162087cac06276a4fb4ce578a1e3d5a
+    name: elfutils
+    evr: 0.192-5.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/h/hostname-3.23-6.el9.src.rpm
+    repoid: rhel-9-for-x86_64-baseos-source-rpms
+    size: 35668
+    checksum: sha256:8128f7855d3b1cf3010f053803642791e63cb919b78684c7ce806b4f0d58fe54
+    name: hostname
+    evr: 3.23-6.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/i/iproute-6.11.0-1.el9.src.rpm
+    repoid: rhel-9-for-x86_64-baseos-source-rpms
+    size: 937429
+    checksum: sha256:11bfd8c1de1c26b8510340b467a933a800134d2e6e6f58a215d729a0727eee58
+    name: iproute
+    evr: 6.11.0-1.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/l/libbpf-1.5.0-1.el9.src.rpm
+    repoid: rhel-9-for-x86_64-baseos-source-rpms
+    size: 143177750
+    checksum: sha256:ee50dc55ea737d1d7969b07da6b02fc093fbbc533498649570b08b3fa9caaa90
+    name: libbpf
+    evr: 2:1.5.0-1.el9
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/l/libmnl-1.0.4-16.el9_4.src.rpm
+    repoid: rhel-9-for-x86_64-baseos-source-rpms
+    size: 313835
+    checksum: sha256:ebfb5c801e7a3a2b83b4c4612ea923b9dd155428e738ff52b03e8966b78d2c08
+    name: libmnl
+    evr: 1.0.4-16.el9_4
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/baseos/source/SRPMS/Packages/p/psmisc-23.4-3.el9.src.rpm
+    repoid: rhel-9-for-x86_64-baseos-source-rpms
+    size: 386002
+    checksum: sha256:9e65fd323b6c88f71e05576b931a10ba4bdce9314114ba88e436482efa77d6bd
+    name: psmisc
+    evr: 23.4-3.el9
+  module_metadata:
+  - url: https://cdn.redhat.com/content/dist/rhel9/9/x86_64/appstream/os/repodata/a25542b527e33c2af2c0cd5971f7a64d354d0526b77f23fb7f37cd54af32316d-modules.yaml.gz
+    repoid: rhel-9-for-x86_64-appstream-rpms
+    size: 31402
+    checksum: sha256:a25542b527e33c2af2c0cd5971f7a64d354d0526b77f23fb7f37cd54af32316d
